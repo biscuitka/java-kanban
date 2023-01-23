@@ -1,5 +1,5 @@
+import manager.Manager;
 import tasks.Epic;
-import tasks.StatusOfTask;
 import tasks.SubTask;
 import tasks.Task;
 
@@ -19,15 +19,13 @@ public class Main {
          */
         Task taskOne = new Task(); // создание задачи
         taskOne.setName("простая задача1");
-        taskOne.setTaskDescription("описание задачи1");
-        taskOne.setStatusOfTask(StatusOfTask.NEW);
-        manager.addTaskToStorage(taskOne); // // добавили в хранилище
+        taskOne.setDescription("описание задачи1");
+        manager.createTaskToStorage(taskOne); // // добавили в хранилище
 
         Task taskTwo = new Task(); // создание задачи
         taskTwo.setName("простая задача2");
-        taskTwo.setTaskDescription("описание задачи2");
-        taskTwo.setStatusOfTask(StatusOfTask.NEW);
-        manager.addTaskToStorage(taskTwo); // // добавили в хранилище
+        taskTwo.setDescription("описание задачи2");
+        manager.createTaskToStorage(taskTwo); // // добавили в хранилище
 
         System.out.println("тест создания tasks- " + "\n" + taskOne + "\n" + taskTwo);
         System.out.println();
@@ -37,23 +35,20 @@ public class Main {
          */
         Epic epicTaskOne = new Epic(); // создание эпика
         epicTaskOne.setName("Эпик1");
-        epicTaskOne.setTaskDescription("Описание эпика1");
-        epicTaskOne.setStatusOfTask(StatusOfTask.NEW);
-        manager.addEpicToStorage(epicTaskOne); // добавили в хранилище
+        epicTaskOne.setDescription("Описание эпика1");
+        manager.createEpicToStorage(epicTaskOne); // добавили в хранилище
 
         SubTask subtaskOne = new SubTask(); // создание подзадач
         subtaskOne.setName("Подзадача1 эпика1");
-        subtaskOne.setTaskDescription("описание подзадачи1");
-        subtaskOne.setStatusOfTask(StatusOfTask.NEW);
-        manager.addSubtaskToStorage(subtaskOne); // добавили в хранилище
+        subtaskOne.setDescription("описание подзадачи1");
+        manager.createSubtaskToStorage(subtaskOne); // добавили в хранилище
         subtaskOne.setEpicTask(epicTaskOne); // сообщили подзадаче о ее эпике
         epicTaskOne.getSubTasks().add(subtaskOne); // сообщили эпику о его подзадаче
 
         SubTask subtaskTwo = new SubTask();
         subtaskTwo.setName("подзадача2 эпика1");
-        subtaskTwo.setTaskDescription("описание подзадачи2");
-        subtaskTwo.setStatusOfTask(StatusOfTask.NEW);
-        manager.addSubtaskToStorage(subtaskTwo); // добавили в хранилище
+        subtaskTwo.setDescription("описание подзадачи2");
+        manager.createSubtaskToStorage(subtaskTwo); // добавили в хранилище
         subtaskTwo.setEpicTask(epicTaskOne); // сообщили подзадаче о ее эпике
         epicTaskOne.getSubTasks().add(subtaskTwo); // сообщили эпику о его подзадаче
 
@@ -62,15 +57,13 @@ public class Main {
          */
         Epic epicTaskTwo = new Epic(); // создание эпика
         epicTaskTwo.setName("Эпик2");
-        epicTaskTwo.setTaskDescription("описание эпика2");
-        epicTaskTwo.setStatusOfTask(StatusOfTask.NEW);
-        manager.addEpicToStorage(epicTaskTwo); // добавили в хранилище
+        epicTaskTwo.setDescription("описание эпика2");
+        manager.createEpicToStorage(epicTaskTwo); // добавили в хранилище
 
         SubTask subTaskThree = new SubTask();
         subTaskThree.setName("подзадача3 эпика2");
-        subTaskThree.setTaskDescription("описание подзадачи3");
-        subTaskThree.setStatusOfTask(StatusOfTask.NEW);
-        manager.addSubtaskToStorage(subTaskThree); // добавили в хранилище
+        subTaskThree.setDescription("описание подзадачи3");
+        manager.createSubtaskToStorage(subTaskThree); // добавили в хранилище
 
         subTaskThree.setEpicTask(epicTaskTwo); // сообщили подзадаче о ее эпике
         epicTaskTwo.getSubTasks().add(subTaskThree); // сообщили эпику о его подзадаче
@@ -86,47 +79,58 @@ public class Main {
         /**
          * тестирование сохранения, получения списков, обновления и удаления задач.
          */
-        System.out.println("тест сохранения задач " + "\n" + manager.taskStorage +
-                "\n" + manager.epicTaskStorage + "\n" + manager.subTasksStorage);
+        System.out.println("тест сохранения задач " + "\n" + manager.getTaskStorage() +
+                "\n" + manager.getEpicTaskStorage() + "\n" + manager.getSubTasksStorage());
         System.out.println();
 
         System.out.println("обновляем задачу");
         manager.updateTask(taskOne);
+        manager.updateEpicTask(epicTaskOne);
+        manager.updateSubTask(subtaskOne);
 
-        System.out.println("хранилище после обновления - " + manager.taskStorage);
+        System.out.println("хранилище после обновления - " + manager.getTaskStorage());
 
         ArrayList<Task> test = manager.getListOfTasks();
-        System.out.println("тест по получению списка- " + "\n" + test);
+        ArrayList<Task> test2 = manager.getListOfEpicTasks();
+        ArrayList<Task> test3 = manager.getListOfSubTasks();
+        System.out.println("тест по получению списка- " + "\n" + test + "\n" + test2 + "\n" + test3);
         System.out.println();
 
-        System.out.println("подзадачи определенного эпика - " + manager.getSubtasksOfEpic(epicTaskOne));
+        System.out.println("подзадачи определенного эпика - " + manager.getSubtasksOfEpic(3));
         System.out.println();
 
         System.out.println("тестируем получение по id 2 " + manager.getTaskById(2));
-        System.out.println("тестируем получение по id 4 " + manager.getTaskById(4));
-        System.out.println("тестируем получение по id 1 " + manager.getTaskById(1));
+        System.out.println("тестируем получение по id 4 " + manager.getEpicTaskById(3));
+        System.out.println("тестируем получение по id 1 " + manager.getSubTaskById(4));
         System.out.println();
 
         System.out.println("дальше удаляем по номеру");
-        manager.removeTaskById(2);
-        manager.removeTaskById(6);
-        manager.removeTaskById(1);
+        manager.deleteTaskById(2);
+        manager.deleteEpicTaskById(3);
+        manager.deleteSubTaskById(4);
 
-        System.out.println("тестируем получение по id 2 после удаления по номеру" + manager.getTaskById(2));
-        System.out.println("тестируем получение по id 4 после удаления по номеру" + manager.getTaskById(4));
-        System.out.println("тестируем получение по id 1 после удаления по номеру" + manager.getTaskById(1));
-        ArrayList<Task> test2 = manager.getListOfTasks();
-        System.out.println("список после удаления по номеру - " + test2);
+        System.out.println("тестируем получение по id 2 после удаления по номеру " + manager.getTaskById(2));
+        System.out.println("тестируем получение по id 3 после удаления по номеру " + manager.getEpicTaskById(3));
+        System.out.println("тестируем получение по id 4 после удаления по номеру " + manager.getSubTaskById(4));
+        ArrayList<Task> test4 = manager.getListOfTasks();
+        ArrayList<Task> test5 = manager.getListOfEpicTasks();
+        ArrayList<Task> test6 = manager.getListOfSubTasks();
+        System.out.println("список после удаления по номеру - " + "\n" + test4 + "\n" + test5 + "\n" + test6);
         System.out.println();
 
         System.out.println("тестируем полное удаление");
-        manager.clearAllTasks();
+        manager.deleteAllTasks();
+        manager.deleteAllEpicTasks();
+        manager.deleteAllSubTasks();
 
-        ArrayList<Task> test3 = manager.getListOfTasks();
-        System.out.println("получение списка после удаления - " + test3);
+
+        ArrayList<Task> test7 = manager.getListOfTasks();
+        ArrayList<Task> test8 = manager.getListOfEpicTasks();
+        ArrayList<Task> test9 = manager.getListOfSubTasks();
+        System.out.println("получение списка после удаления - " + "\n" + test7 + "\n" + test8 + "\n" + test9);
 
         System.out.print("если удалить несуществующую задачу - ");
-        manager.removeTaskById(6);
+        manager.deleteTaskById(6);
 
 
     }

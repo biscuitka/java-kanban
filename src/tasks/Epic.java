@@ -22,7 +22,7 @@ public class Epic extends Task {
      * @return статус эпика
      */
     @Override
-    public StatusOfTask getStatusOfTask() {
+    public StatusOfTask getStatus() {
         boolean isNewStatus = true;
         boolean isDoneStatus = true;
 
@@ -31,10 +31,10 @@ public class Epic extends Task {
         }
 
         for (Task subTask : subTasks) {
-            if (subTask.getStatusOfTask() != StatusOfTask.NEW){
+            if (subTask.getStatus() != StatusOfTask.NEW){
                 isNewStatus = false;
             }
-            if (subTask.getStatusOfTask() != StatusOfTask.DONE){
+            if (subTask.getStatus() != StatusOfTask.DONE){
                 isDoneStatus = false;
             }
         }
@@ -46,4 +46,6 @@ public class Epic extends Task {
         }
         return StatusOfTask.IN_PROGRESS;
     }
+
+
 }

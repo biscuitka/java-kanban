@@ -1,18 +1,22 @@
 package tasks;
+import manager.Manager;
 
 /**
  * класс представляет отдельно стоящую задачу
  */
 public class Task {
+    private int id;
     private String name;
-    private String taskDescription;
-    private StatusOfTask statusOfTask;
+    private String description;
+    private StatusOfTask status;
 
     /**
-     * конструктор без параметров
+     * в конструкторе задается статус задания NEW
      */
     public Task() {
+        status = StatusOfTask.NEW;
     }
+
 
     /**
      * методы get и set
@@ -22,32 +26,37 @@ public class Task {
         return name;
     }
 
-    public String getTaskDescription() {
-        return taskDescription;
+    public String getDescription() {
+        return description;
     }
 
-    public StatusOfTask getStatusOfTask() {
-        return statusOfTask;
-    }
-
-    public void setStatusOfTask(StatusOfTask statusOfTask) {
-        this.statusOfTask = statusOfTask;
+    public StatusOfTask getStatus() {
+        return status;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setTaskDescription(String taskDescription) {
-        this.taskDescription = taskDescription;
+    public void setDescription(String description) {
+        this.description = description;
     }
+
 
     @Override
     public String toString() {
-        return "tasks.Task{" +
+        return "Task{" +
                 "name='" + name + '\'' +
-                ", taskDescription='" + taskDescription + '\'' +
-                ", statusOfTask=" + statusOfTask +
+                ", description='" + description + '\'' +
+                ", status=" + status +
                 '}';
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

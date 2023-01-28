@@ -20,12 +20,12 @@ public class Main {
         Task taskOne = new Task(); // создание задачи
         taskOne.setName("простая задача1");
         taskOne.setDescription("описание задачи1");
-        manager.createTaskToStorage(taskOne); // // добавили в хранилище
+        manager.createTask(taskOne); // // добавили в хранилище
 
         Task taskTwo = new Task(); // создание задачи
         taskTwo.setName("простая задача2");
         taskTwo.setDescription("описание задачи2");
-        manager.createTaskToStorage(taskTwo); // // добавили в хранилище
+        manager.createTask(taskTwo); // // добавили в хранилище
 
         System.out.println("тест создания tasks- " + "\n" + taskOne + "\n" + taskTwo);
         System.out.println();
@@ -36,19 +36,19 @@ public class Main {
         Epic epicTaskOne = new Epic(); // создание эпика
         epicTaskOne.setName("Эпик1");
         epicTaskOne.setDescription("Описание эпика1");
-        manager.createEpicToStorage(epicTaskOne); // добавили в хранилище
+        manager.createEpic(epicTaskOne); // добавили в хранилище
 
         SubTask subtaskOne = new SubTask(); // создание подзадач
         subtaskOne.setName("Подзадача1 эпика1");
         subtaskOne.setDescription("описание подзадачи1");
-        manager.createSubtaskToStorage(subtaskOne); // добавили в хранилище
+        manager.createSubtask(subtaskOne); // добавили в хранилище
         subtaskOne.setEpicTask(epicTaskOne); // сообщили подзадаче о ее эпике
         epicTaskOne.getSubTasks().add(subtaskOne); // сообщили эпику о его подзадаче
 
         SubTask subtaskTwo = new SubTask();
         subtaskTwo.setName("подзадача2 эпика1");
         subtaskTwo.setDescription("описание подзадачи2");
-        manager.createSubtaskToStorage(subtaskTwo); // добавили в хранилище
+        manager.createSubtask(subtaskTwo); // добавили в хранилище
         subtaskTwo.setEpicTask(epicTaskOne); // сообщили подзадаче о ее эпике
         epicTaskOne.getSubTasks().add(subtaskTwo); // сообщили эпику о его подзадаче
 
@@ -58,12 +58,12 @@ public class Main {
         Epic epicTaskTwo = new Epic(); // создание эпика
         epicTaskTwo.setName("Эпик2");
         epicTaskTwo.setDescription("описание эпика2");
-        manager.createEpicToStorage(epicTaskTwo); // добавили в хранилище
+        manager.createEpic(epicTaskTwo); // добавили в хранилище
 
         SubTask subTaskThree = new SubTask();
         subTaskThree.setName("подзадача3 эпика2");
         subTaskThree.setDescription("описание подзадачи3");
-        manager.createSubtaskToStorage(subTaskThree); // добавили в хранилище
+        manager.createSubtask(subTaskThree); // добавили в хранилище
 
         subTaskThree.setEpicTask(epicTaskTwo); // сообщили подзадаче о ее эпике
         epicTaskTwo.getSubTasks().add(subTaskThree); // сообщили эпику о его подзадаче

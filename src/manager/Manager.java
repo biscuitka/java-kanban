@@ -6,6 +6,7 @@ import tasks.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * класс по работе всеми видами задач
@@ -19,7 +20,6 @@ public class Manager {
 
     /**
      * метод по созданию простых задач
-     *
      * @param task принимает простую задачу
      */
     public void createTask(Task task) {
@@ -29,7 +29,6 @@ public class Manager {
 
     /**
      * метод по созданию больших задач
-     *
      * @param epic принимает большую задачу
      */
     public void createEpic(Epic epic) {
@@ -39,7 +38,6 @@ public class Manager {
 
     /**
      * метод по созданию подзадач для эпиков
-     *
      * @param subtask принимает подзадачу
      */
     public void createSubtask(SubTask subtask) {
@@ -49,7 +47,6 @@ public class Manager {
 
     /**
      * метод по получению списка всех задач
-     *
      * @return список задач
      */
     public ArrayList<Task> getListOfTasks() {
@@ -58,7 +55,6 @@ public class Manager {
 
     /**
      * метод по получению списка всех эпиков
-     *
      * @return список эпиков
      */
     public ArrayList<Task> getListOfEpicTasks() {
@@ -67,7 +63,6 @@ public class Manager {
 
     /**
      * метод по получению списка всех подзадач
-     *
      * @return список подзадач
      */
     public ArrayList<Task> getListOfSubTasks() {
@@ -80,29 +75,6 @@ public class Manager {
     public void deleteAllTasks() {
         taskStorage.clear();
     }
-    /*
-     public void deleteEpicTaskById(int id) {
-        if (epicTaskStorage.containsKey(id)) { // проверяем наличие эпика по ключу
-            Epic epic = getEpicTaskById(id); // если есть, то подтягиваем его сюда
-            for(SubTask subTask: epic.getSubTasks()) { // проходим циклом по его подзадачам
-                subTasksStorage.remove(subTask); // удаляем из хранилища найденные сабтаски этого эпика
-            }
-            epicTaskStorage.remove(id); // удаляем сам эпик
-        } else {
-            System.out.println("Задачи с таким id нет");
-        }
-    }
-    public void deleteSubTaskById(int id) {
-        if (subTasksStorage.containsKey(id)) { // проверяем наличие сабтаски по ключу
-            SubTask subTask = getSubTaskById(id); // если есть, то также подтягиваем ее сюда
-            subTask.getEpicTask().getSubTasks().remove(subTask); // обратились к сабтаску, получили ссылку на его эпик,
-            // получили список сабтаск этого эпика, удалили из этого списка сабтаску
-            subTasksStorage.remove(id); // удаляем сабтаску по номеру
-        } else {
-            System.out.println("Задачи с таким id нет");
-        }
-    }
-     */
 
     /**
      * метод удаляет все эпики, а с ними все сабтаски
@@ -113,16 +85,17 @@ public class Manager {
     }
 
     /**
-     * метод удаляет все подзадачи.
+     * метод удаляет все подзадачи и чистим списки сабтасок у эпиков
      */
     public void deleteAllSubTasks() {
         subTasksStorage.clear();
-        //Не поняла - При удалении эпика следует также почистить коллекцию сабтасок внутри эпика
+        for (Epic epic : epicTaskStorage.values()) {
+            epic.getSubTasks().clear();
+        }
     }
 
     /**
      * метод получения задачи по идентификатору
-     *
      * @param id принимает id по которому нужно получить задачу
      * @return возвращает найденную задачу
      */
@@ -132,7 +105,6 @@ public class Manager {
 
     /**
      * метод получения эпика по идентификатору
-     *
      * @param id принимает id по которому нужно получить эпик
      * @return возвращает найденную задачу
      */
@@ -142,7 +114,6 @@ public class Manager {
 
     /**
      * метод получения подзадачи по идентификатору
-     *
      * @param id принимает id по которому нужно получить подзадачу
      * @return возвращает найденную задачу
      */
@@ -152,7 +123,6 @@ public class Manager {
 
     /**
      * метод для получения списка всех подзадач определённого эпика.
-     *
      * @param id принимает номер эпика
      * @return список подзадач
      */
@@ -162,7 +132,6 @@ public class Manager {
 
     /**
      * метод по обновлению задачи
-     *
      * @param task обновленная задача
      */
     public void updateTask(Task task) {
@@ -171,7 +140,6 @@ public class Manager {
 
     /**
      * метод по обновлению эпика
-     *
      * @param epic обновленный эпик
      */
     public void updateEpicTask(Epic epic) {
@@ -180,40 +148,57 @@ public class Manager {
 
     /**
      * метод по обновлению подзадачи
-     *
      * @param subTask обновленная подзадача
      */
     public void updateSubTask(SubTask subTask) {
         subTasksStorage.put(subTask.getId(), subTask);
+
+        Epic epic = subTask.getEpicTask();
+        List<SubTask> subTasks = epic.getSubTasks();
+
+        for (SubTask subTaskOfEpic : subTasks) {
+            if (subTask.getId() == subTaskOfEpic.getId()) {
+                subTasks.remove(subTaskOfEpic);
+                break;
+            }
+        }
+        subTasks.add(subTask);
     }
+
 
     /**
      * метод удаления задачи по номеру.
-     *
      * @param id принимает номер искомой задачи
      */
     public void deleteTaskById(int id) {
-        if (taskStorage.containsKey(id))
+        if (taskStorage.containsKey(id)) // эту строку можно удалить, кажется в данном случае она не имеет смысла?
             taskStorage.remove(id);
 
     }
 
+    /**
+     * метод удаления эпика по номеру.
+     * @param id принимает номер искомого эпика
+     */
     public void deleteEpicTaskById(int id) {
-        if (epicTaskStorage.containsKey(id)) { // проверяем наличие эпика по ключу
-            Epic epic = getEpicTaskById(id); // если есть, то подтягиваем его сюда
-            for (SubTask subTask : epic.getSubTasks()) { // проходим циклом по его подзадачам
-                subTasksStorage.remove(subTask); // удаляем из хранилища найденные сабтаски этого эпика
+        if (epicTaskStorage.containsKey(id)) {
+            Epic epic = getEpicTaskById(id);
+            for (SubTask subTask : epic.getSubTasks()) {
+                subTasksStorage.remove(subTask.getId());
             }
-            epicTaskStorage.remove(id); // удаляем сам эпик
+            epicTaskStorage.remove(id);
         }
     }
 
+    /**
+     * метод удаления подзадачи по номеру.
+     * @param id принимает номер искомой подзадачи
+     */
     public void deleteSubTaskById(int id) {
-        if (subTasksStorage.containsKey(id)) { // проверяем наличие сабтаски по ключу
-            SubTask subTask = getSubTaskById(id); // если есть, то также подтягиваем ее сюда
-            subTask.getEpicTask().getSubTasks().remove(subTask); // обратились к сабтаску, получили ссылку на его эпик,
-            // получили список сабтаск этого эпика, удалили из этого списка сабтаску
-            subTasksStorage.remove(id); // удаляем сабтаску по номеру
+        if (subTasksStorage.containsKey(id)) {
+            SubTask subTask = getSubTaskById(id);
+            subTask.getEpicTask().getSubTasks().remove(subTask);
+            subTasksStorage.remove(id);
         }
     }
 

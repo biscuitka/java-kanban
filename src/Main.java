@@ -17,15 +17,15 @@ public class Main {
         /**
          * создание 2х простых задач
          */
-        Task taskOne = new Task(); // создание задачи
+        Task taskOne = new Task();
         taskOne.setName("простая задача1");
         taskOne.setDescription("описание задачи1");
-        manager.createTask(taskOne); // // добавили в хранилище
+        manager.createTask(taskOne);
 
-        Task taskTwo = new Task(); // создание задачи
+        Task taskTwo = new Task();
         taskTwo.setName("простая задача2");
         taskTwo.setDescription("описание задачи2");
-        manager.createTask(taskTwo); // // добавили в хранилище
+        manager.createTask(taskTwo);
 
         System.out.println("тест создания tasks- " + "\n" + taskOne + "\n" + taskTwo);
         System.out.println();
@@ -33,40 +33,40 @@ public class Main {
         /**
          * создание 1го эпика с 2мя подзадачами
          */
-        Epic epicTaskOne = new Epic(); // создание эпика
+        Epic epicTaskOne = new Epic();
         epicTaskOne.setName("Эпик1");
         epicTaskOne.setDescription("Описание эпика1");
-        manager.createEpic(epicTaskOne); // добавили в хранилище
+        manager.createEpic(epicTaskOne);
 
-        SubTask subtaskOne = new SubTask(); // создание подзадач
+        SubTask subtaskOne = new SubTask();
         subtaskOne.setName("Подзадача1 эпика1");
         subtaskOne.setDescription("описание подзадачи1");
-        manager.createSubtask(subtaskOne); // добавили в хранилище
-        subtaskOne.setEpicTask(epicTaskOne); // сообщили подзадаче о ее эпике
-        epicTaskOne.getSubTasks().add(subtaskOne); // сообщили эпику о его подзадаче
+        manager.createSubtask(subtaskOne);
+        subtaskOne.setEpicTask(epicTaskOne);
+        epicTaskOne.getSubTasks().add(subtaskOne);
 
         SubTask subtaskTwo = new SubTask();
         subtaskTwo.setName("подзадача2 эпика1");
         subtaskTwo.setDescription("описание подзадачи2");
-        manager.createSubtask(subtaskTwo); // добавили в хранилище
-        subtaskTwo.setEpicTask(epicTaskOne); // сообщили подзадаче о ее эпике
-        epicTaskOne.getSubTasks().add(subtaskTwo); // сообщили эпику о его подзадаче
+        manager.createSubtask(subtaskTwo);
+        subtaskTwo.setEpicTask(epicTaskOne);
+        epicTaskOne.getSubTasks().add(subtaskTwo);
 
         /**
          * создание 2го эпика с 1й подзадачей
          */
-        Epic epicTaskTwo = new Epic(); // создание эпика
+        Epic epicTaskTwo = new Epic();
         epicTaskTwo.setName("Эпик2");
         epicTaskTwo.setDescription("описание эпика2");
-        manager.createEpic(epicTaskTwo); // добавили в хранилище
+        manager.createEpic(epicTaskTwo);
 
         SubTask subTaskThree = new SubTask();
         subTaskThree.setName("подзадача3 эпика2");
         subTaskThree.setDescription("описание подзадачи3");
-        manager.createSubtask(subTaskThree); // добавили в хранилище
+        manager.createSubtask(subTaskThree);
 
-        subTaskThree.setEpicTask(epicTaskTwo); // сообщили подзадаче о ее эпике
-        epicTaskTwo.getSubTasks().add(subTaskThree); // сообщили эпику о его подзадаче
+        subTaskThree.setEpicTask(epicTaskTwo);
+        epicTaskTwo.getSubTasks().add(subTaskThree);
 
 
         System.out.println("тест создания epicTask - " + "\n" + epicTaskOne + "\n" + epicTaskTwo);

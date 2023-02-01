@@ -1,4 +1,5 @@
-import manager.Manager;
+import managers.Managers;
+import managers.TaskManager;
 import tasks.Epic;
 import tasks.SubTask;
 import tasks.Task;
@@ -12,7 +13,7 @@ public class Main {
         /**
          * тестирование
          */
-        Manager manager = new Manager();
+        TaskManager manager = Managers.getDefault();
 
         /**
          * создание 2х простых задач
@@ -97,11 +98,15 @@ public class Main {
         System.out.println();
 
         System.out.println("подзадачи определенного эпика - " + manager.getSubtasksOfEpic(3));
+        System.out.println("История просмотров задач:\n" + TaskManager.historyManager.getHistory());
         System.out.println();
 
         System.out.println("тестируем получение по id 2 " + manager.getTaskById(2));
+        System.out.println("История просмотров задач:\n" + TaskManager.historyManager.getHistory());
         System.out.println("тестируем получение по id 4 " + manager.getEpicTaskById(3));
+        System.out.println("История просмотров задач:\n" + TaskManager.historyManager.getHistory());
         System.out.println("тестируем получение по id 1 " + manager.getSubTaskById(4));
+        System.out.println("История просмотров задач:\n" + TaskManager.historyManager.getHistory());
         System.out.println();
 
         System.out.println("дальше удаляем по номеру");
@@ -116,6 +121,7 @@ public class Main {
         ArrayList<Task> test5 = manager.getListOfEpicTasks();
         ArrayList<Task> test6 = manager.getListOfSubTasks();
         System.out.println("список после удаления по номеру - " + "\n" + test4 + "\n" + test5 + "\n" + test6);
+        System.out.println("История просмотров задач:\n" + TaskManager.historyManager.getHistory());
         System.out.println();
 
         System.out.println("тестируем полное удаление");

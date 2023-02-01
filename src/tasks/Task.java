@@ -1,5 +1,5 @@
 package tasks;
-import manager.Manager;
+
 
 /**
  * класс представляет отдельно стоящую задачу

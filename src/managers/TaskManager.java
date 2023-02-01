@@ -1,4 +1,4 @@
-package manager;
+package managers;
 
 import tasks.Epic;
 import tasks.SubTask;
@@ -6,12 +6,16 @@ import tasks.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
- * класс по работе всеми видами задач
+ * интерфейс для управления задачами
  */
 public interface TaskManager {
-       /**
+
+    HistoryManager historyManager = Managers.getDefaultHistory();
+
+    /**
      * метод по созданию простых задач
      * @param task принимает простую задачу
      */
@@ -119,6 +123,8 @@ public interface TaskManager {
      * @param id принимает номер искомой подзадачи
      */
     public void deleteSubTaskById(int id);
+
+    List<Task> getHistory();
 
     public HashMap<Integer, Task> getTaskStorage();
 

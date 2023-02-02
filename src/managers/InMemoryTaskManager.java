@@ -13,10 +13,12 @@ public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer, Task> taskStorage = new HashMap<>();
     private final HashMap<Integer, Epic> epicTaskStorage = new HashMap<>();
     private final HashMap<Integer, SubTask> subTasksStorage = new HashMap<>();
+    private HistoryManager historyManager = Managers.getDefaultHistory();
 
 
     /**
      * метод по созданию простых задач
+     *
      * @param task принимает простую задачу
      */
     @Override
@@ -27,6 +29,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * метод по созданию больших задач
+     *
      * @param epic принимает большую задачу
      */
     @Override
@@ -37,6 +40,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * метод по созданию подзадач для эпиков
+     *
      * @param subtask принимает подзадачу
      */
     @Override
@@ -47,6 +51,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * метод по получению списка всех задач
+     *
      * @return список задач
      */
     @Override
@@ -56,6 +61,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * метод по получению списка всех эпиков
+     *
      * @return список эпиков
      */
     @Override
@@ -65,6 +71,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * метод по получению списка всех подзадач
+     *
      * @return список подзадач
      */
     @Override
@@ -102,6 +109,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * метод получения задачи по идентификатору
+     *
      * @param id принимает id по которому нужно получить задачу
      * @return возвращает найденную задачу
      */
@@ -113,6 +121,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * метод получения эпика по идентификатору
+     *
      * @param id принимает id по которому нужно получить эпик
      * @return возвращает найденную задачу
      */
@@ -124,6 +133,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * метод получения подзадачи по идентификатору
+     *
      * @param id принимает id по которому нужно получить подзадачу
      * @return возвращает найденную задачу
      */
@@ -135,6 +145,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * метод для получения списка всех подзадач определённого эпика.
+     *
      * @param id принимает номер эпика
      * @return список подзадач
      */
@@ -145,6 +156,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * метод по обновлению задачи
+     *
      * @param task обновленная задача
      */
     @Override
@@ -154,6 +166,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * метод по обновлению эпика
+     *
      * @param epic обновленный эпик
      */
     @Override
@@ -163,6 +176,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * метод по обновлению подзадачи
+     *
      * @param subTask обновленная подзадача
      */
     @Override
@@ -183,6 +197,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * метод удаления задачи по номеру.
+     *
      * @param id принимает номер искомой задачи
      */
     @Override
@@ -192,6 +207,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * метод удаления эпика по номеру.
+     *
      * @param id принимает номер искомого эпика
      */
     @Override
@@ -207,6 +223,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * метод удаления подзадачи по номеру.
+     *
      * @param id принимает номер искомой подзадачи
      */
     @Override
@@ -220,27 +237,12 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * метод возвращает список просмотренных задач
+     *
      * @return список задач
      */
     @Override
     public List<Task> getHistory() {
         return historyManager.getHistory();
-    }
-
-
-    @Override
-    public HashMap<Integer, Task> getTaskStorage() {
-        return taskStorage;
-    }
-
-    @Override
-    public HashMap<Integer, Epic> getEpicTaskStorage() {
-        return epicTaskStorage;
-    }
-
-    @Override
-    public HashMap<Integer, SubTask> getSubTasksStorage() {
-        return subTasksStorage;
     }
 
 }

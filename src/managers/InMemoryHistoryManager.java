@@ -1,20 +1,20 @@
 package managers;
 
 import tasks.Task;
+
 import java.util.LinkedList;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private LinkedList<Task> browsingHistory = new LinkedList<>();
+    private final LinkedList<Task> browsingHistory = new LinkedList<>();
+
     @Override
     public void add(Task task) {
-        if (browsingHistory.size() < 10) {
-            browsingHistory.addLast(task);
-        } else {
+        if (browsingHistory.size() >= 10) {
             browsingHistory.removeFirst();
-            browsingHistory.addLast(task);
         }
+        browsingHistory.addLast(task);
     }
 
     @Override

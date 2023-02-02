@@ -7,17 +7,17 @@ public class Managers {
 
     /**
      * подбирает нужную реализацию и возвращает объект правильного типа
+     *
      * @return возвращает объект-менеджер
      */
-    public static managers.InMemoryTaskManager getDefault(){
-        return new managers.InMemoryTaskManager();
+    public static TaskManager getDefault() {
+        return new InMemoryTaskManager();
     }
 
     /**
-     *
      * @return возвращает объект - историю просмотров
      */
-    public static HistoryManager getDefaultHistory(){
+    public static HistoryManager getDefaultHistory() {
         return new InMemoryHistoryManager();
     }
 }

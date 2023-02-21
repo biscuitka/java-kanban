@@ -1,7 +1,9 @@
 package managers;
 
-import tasks.Task;
-
+/**
+ * класс узла списка задач
+ * @param <Task>
+ */
 public class Node<Task> {
     public Task data;
     public Node<Task> next;

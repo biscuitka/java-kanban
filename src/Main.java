@@ -118,6 +118,15 @@ public class Main {
         System.out.println("тестируем получение по id 4 " + manager.getSubTaskById(4));
         System.out.println("История просмотров задач:\n" + manager.getHistory());
         System.out.println();
+        System.out.println("! Здесь выбрасывалось NullPointerException, после внесения изменений в класс Node" +
+                "метод removeNode(Node<Task> node) работает вроде корректно.");
+        System.out.println("тестируем получение по id 4 " + manager.getSubTaskById(4));
+        System.out.println("История просмотров задач:\n" + manager.getHistory());
+        System.out.println();
+        System.out.println("тестируем получение по id 4 " + manager.getSubTaskById(4));
+        System.out.println("История просмотров задач:\n" + manager.getHistory());
+        System.out.println();
+
 
         System.out.println("дальше удаляем по номеру задачу(2)");
         manager.deleteTaskById(2);

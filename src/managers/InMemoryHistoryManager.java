@@ -8,9 +8,9 @@ import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    public Node<Task> head;
-    public Node<Task> tail;
-    private final HashMap<Integer, Node<Task>> incomingTask = new HashMap<>();
+    private Node head;
+    private Node tail;
+    private final HashMap<Integer, Node> incomingTask = new HashMap<>();
 
     /**
      * метод добавляет задачу в список и исключая повторные просмотры - узел и саму задачу из мапы
@@ -47,14 +47,14 @@ public class InMemoryHistoryManager implements HistoryManager {
      * @param task задача
      */
     private void linkLast(Task task) {
-        final Node<Task> oldTail = tail;
-        final Node<Task> newNode = new Node<>(oldTail, task, null);
+        final Node oldTail = tail;
+        final Node newNode = new Node(oldTail, task, null);
         tail = newNode;
         incomingTask.put(task.getId(), newNode);
         if (oldTail == null) {
             head = newNode;
         } else {
-            oldTail.next = newNode;
+            oldTail.setNext(newNode);
         }
     }
 
@@ -63,23 +63,23 @@ public class InMemoryHistoryManager implements HistoryManager {
      *
      * @param node узел задачи
      */
-    private void removeNode(Node<Task> node) {
+    private void removeNode(Node node) {
         if (node != null) {
-            final Node<Task> prev = node.prev;
-            final Node<Task> next = node.next;
+            final Node prev = node.getPrev();
+            final Node next = node.getNext();
 
             if (head == node && tail == node) {
                 head = null;
                 tail = null;
             } else if (tail == node) {
                 tail = prev;
-                tail.next = null;
+                tail.setNext(null);
             } else if (head == node) {
                 head = next;
-                head.prev = null;
+                head.setPrev(null);
             } else {
-                prev.next = next;
-                next.prev = prev;
+                prev.setNext(next);
+                next.setPrev(prev);
             }
 
         }
@@ -93,11 +93,11 @@ public class InMemoryHistoryManager implements HistoryManager {
      */
     private List<Task> getTasks() {
         List<Task> taskList = new ArrayList<>();
-        Node<Task> actualNode = head;
+        Node actualNode = head;
 
         while (actualNode != null) {
-            taskList.add(actualNode.data);
-            actualNode = actualNode.next;
+            taskList.add(actualNode.getData());
+            actualNode = actualNode.getNext();
         }
         return taskList;
     }

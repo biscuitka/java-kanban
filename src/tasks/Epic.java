@@ -1,5 +1,7 @@
 package tasks;
 
+import managers.TypeOfTask;
+
 import java.util.ArrayList;
 
 /**
@@ -47,5 +49,16 @@ public class Epic extends Task {
         return StatusOfTask.IN_PROGRESS;
     }
 
+
+    @Override
+    public String toString() {
+        return "Эпик{" +
+                "id='" + getId() + '\'' +
+                "name='" + getName() + '\'' +
+                ", description='" + getDescription() + '\'' +
+                ", status=" + getStatus() +
+                "subTasks=" + subTasks +
+                '}';
+    }
 
 }

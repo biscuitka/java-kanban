@@ -1,18 +1,24 @@
 package managers;
 
+import java.io.File;
+
 /**
  * утилитарный класс, отвечает за создание менеджера задач
  */
 public class Managers {
 
-    /**
-     * подбирает нужную реализацию и возвращает объект правильного типа
-     *
-     * @return возвращает объект-менеджер
-     */
+
+    /*
     public static TaskManager getDefault() {
         return new InMemoryTaskManager();
     }
+    */
+
+    public static FileBackedTasksManager getDefault() {
+        return FileBackedTasksManager.
+                loadFromFile(new File("history.csv"));
+    }
+
 
     /**
      * @return возвращает объект - историю просмотров

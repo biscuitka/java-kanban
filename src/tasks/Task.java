@@ -1,6 +1,8 @@
 package tasks;
 
 
+import managers.TypeOfTask;
+
 /**
  * класс представляет отдельно стоящую задачу
  */
@@ -18,10 +20,6 @@ public class Task {
     }
 
 
-    /**
-     * методы get и set
-     * @return поля
-     */
     public String getName() {
         return name;
     }
@@ -45,7 +43,8 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
+        return "Задача{" +
+                "id='" + id + '\'' +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +

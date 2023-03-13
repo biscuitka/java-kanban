@@ -209,7 +209,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteTaskById(int id) {
         taskStorage.remove(id);
-        historyManager.remove(id); 
+        historyManager.remove(id);
     }
 
     /**
@@ -257,6 +257,18 @@ public class InMemoryTaskManager implements TaskManager {
 
     public HistoryManager getHistoryManager() {
         return historyManager;
+    }
+
+    public HashMap<Integer, SubTask> getSubTasksStorage() {
+        return subTasksStorage;
+    }
+
+    public HashMap<Integer, Task> getTaskStorage() {
+        return taskStorage;
+    }
+
+    public HashMap<Integer, Epic> getEpicTaskStorage() {
+        return epicTaskStorage;
     }
 }
 

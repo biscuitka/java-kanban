@@ -258,5 +258,17 @@ public class InMemoryTaskManager implements TaskManager {
     public HistoryManager getHistoryManager() {
         return historyManager;
     }
+
+    public HashMap<Integer, Task> getTaskStorage() {
+        return taskStorage;
+    }
+
+    public HashMap<Integer, Epic> getEpicTaskStorage() {
+        return epicTaskStorage;
+    }
+
+    public HashMap<Integer, SubTask> getSubTasksStorage() {
+        return subTasksStorage;
+    }
 }
 

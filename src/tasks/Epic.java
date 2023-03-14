@@ -10,6 +10,10 @@ import java.util.ArrayList;
 public class Epic extends Task {
     private ArrayList<SubTask> subTasks = new ArrayList<>();
 
+    public Epic() {
+        setType(TypeOfTask.EPIC);
+    }
+
     public ArrayList<SubTask> getSubTasks() {
         return subTasks;
     }
@@ -59,6 +63,11 @@ public class Epic extends Task {
                 ", status=" + getStatus() +
                 ", subTasks=" + subTasks +
                 '}';
+    }
+    @Override
+    public String toStringInFile() {
+        String format = "%s,%s,%s,%s,%s,%s";
+        return String.format(format,getId(),getType(),getName(),getDescription(),getStatus(), " ");
     }
 
 }

@@ -11,12 +11,14 @@ public class Task {
     private String name;
     private String description;
     private StatusOfTask status;
+    private TypeOfTask type;
 
     /**
      * в конструкторе задается статус задания NEW
      */
     public Task() {
         status = StatusOfTask.NEW;
+        setType(TypeOfTask.TASK);
     }
 
 
@@ -39,6 +41,13 @@ public class Task {
     public void setDescription(String description) {
         this.description = description;
     }
+    public TypeOfTask getType() {
+        return type;
+    }
+
+    public void setType(TypeOfTask typeOfTask) {
+        type = typeOfTask;
+    }
 
 
     @Override
@@ -49,6 +58,10 @@ public class Task {
                 ", description='" + description + '\'' +
                 ", status=" + status +
                 '}';
+    }
+    public String toStringInFile() {
+        String format = "%s,%s,%s,%s,%s,%s";
+        return String.format(format,getId(),type,getName(),getDescription(),getStatus()," ");
     }
 
     public int getId() {

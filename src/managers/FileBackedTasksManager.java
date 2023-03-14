@@ -9,6 +9,8 @@ import tasks.Task;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +37,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         // тестирование
         TaskManager manager = Managers.getDefault();
 
-        //создание задач разных типов для записи в файл
+/*
+       //создание задач разных типов для записи в файл
         Task taskOne = new Task();
         taskOne.setName("простая задача1");
         taskOne.setDescription("описание задачи1");
@@ -55,15 +58,15 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         subtaskOne.setName("Подзадача1 эпика1");
         subtaskOne.setDescription("описание подзадачи1");
         subtaskOne.setEpicTask(epicTaskOne);
-        manager.createSubtask(subtaskOne);
         epicTaskOne.getSubTasks().add(subtaskOne);
+        manager.createSubtask(subtaskOne);
 
         SubTask subtaskTwo = new SubTask();
         subtaskTwo.setName("подзадача2 эпика1");
         subtaskTwo.setDescription("описание подзадачи2");
         subtaskTwo.setEpicTask(epicTaskOne);
-        manager.createSubtask(subtaskTwo);
         epicTaskOne.getSubTasks().add(subtaskTwo);
+        manager.createSubtask(subtaskTwo);
 
         Epic epicTaskTwo = new Epic();
         epicTaskTwo.setName("Эпик2");
@@ -79,6 +82,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
         System.out.println("тест создания subTask - " + "\n" + subtaskOne + "\n" + subtaskTwo);
         System.out.println();
+*/
+
 
         // тестирование получения и истории
         System.out.println("список простых задач- " + "\n" + manager.getListOfTasks());
@@ -135,13 +140,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             fileWriter.write(FIRST_lINE);
 
             for (Task task : getListOfTasks()) {
-                fileWriter.write(toStringInFile(task) + "\n");
+                fileWriter.write(task.toStringInFile() + "\n");
             }
             for (Task epic : getListOfEpicTasks()) {
-                fileWriter.write(toStringInFile(epic) + "\n");
+                fileWriter.write(epic.toStringInFile() + "\n");
             }
             for (Task subtask : getListOfSubTasks()) {
-                fileWriter.write(toStringInFile(subtask) + "\n");
+                fileWriter.write(subtask.toStringInFile() + "\n");
             }
 
             fileWriter.write("\n");
@@ -155,84 +160,64 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     }
 
-
-    /**
-     * метод сохранения задачи в строку
-     *
-     * @return строку из задачи
-     * @return
-     */
-    public String toStringInFile(Task task) {
-        TypeOfTask type;
-        String epicId = " ";
-
-        if (task instanceof Epic) {
-            type = TypeOfTask.EPIC;
-        } else if (task instanceof SubTask) {
-            type = TypeOfTask.SUBTASK;
-            int id = ((SubTask) task).getEpicTask().getId();
-            epicId = Integer.toString(id);
-        } else {
-            type = TypeOfTask.TASK;
-        }
-        String format = "%s,%s,%s,%s,%s,%s";
-        return String.format(format, task.getId(), type, task.getName(),
-                task.getDescription(), task.getStatus(), epicId);
-    }
-
-
     /**
      * восстанавливает данные менеджера из файла при запуске программы
      *
-     * @param file
-     * @return
+     * @param file файл с данными задач
+     * @return менеджер
      */
     public static FileBackedTasksManager loadFromFile(File file) {
         FileBackedTasksManager tasksManager = new FileBackedTasksManager(file);
+        String path = file.getPath();
+        String taskLine = "";
+        String historyLine = "";
+        boolean isTask = true;
+        int id;
 
-        try (BufferedReader buffer = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
-            buffer.readLine();
-            boolean isTask = true;
-            while (buffer.ready()) {
-                String taskLine = buffer.readLine();
-                if (taskLine.isEmpty()) {
-                    isTask = false;
-                }
-                if (isTask) {
-                    if (taskLine.equals(FIRST_lINE)) {
-                        continue;
-                    }
-                    int id = Integer.parseInt(taskLine.split(",")[0]);
-                    String type = String.valueOf(taskLine.split(",")[1]);
-
-                    if (type.equalsIgnoreCase("TASK")) {
-                        Task task = fromString(taskLine, tasksManager);
-                        tasksManager.createTaskFromFile(task, id); // метод, чтобы сохранять изначальный id
-                    } else if (type.equalsIgnoreCase("EPIC")) {
-                        Epic epic = (Epic) fromString(taskLine, tasksManager);
-                        tasksManager.createEpicFromFile(epic, id);
-                    } else {
-                        SubTask subTask = (SubTask) fromString(taskLine, tasksManager);
-                        if (subTask != null) {
-                            subTask.setEpicTask(tasksManager.getEpicTaskById(id));
-                            tasksManager.createSubtaskFromFile(subTask, id);
-                        }
-                    }
-                } else {
-                    String historyLine = taskLine;
-                    List<Integer> idOfTasks = historyFromString(historyLine);
-                    for (Integer id : idOfTasks) {
-                        tasksManager.getHistoryManager().add(allTasks(id, tasksManager));
-
-                    }
-                }
-            }
-
+        try {
+            taskLine = Files.readString(Path.of(path));
         } catch (IOException exp) {
             throw new ManagerSaveException("Ошибка чтения файла.");
         }
+        String[] lines = taskLine.split("\n");
+        for (String line : lines) {
+            if (line.isEmpty()) {
+                isTask = false;
+            }
+            if (line.equals(FIRST_lINE)) {
+                continue;
+            }
+            if (isTask) {
+                String type = String.valueOf(line.split(",")[1]);
+
+                if (type.equalsIgnoreCase("TASK")) {
+                    Task task = fromString(line, tasksManager);
+                    assert task != null;
+                    id = task.getId();
+                    tasksManager.createTaskFromFile(task, id);
+                } else if (type.equalsIgnoreCase("EPIC")) {
+                    Epic epic = (Epic) fromString(line, tasksManager);
+                    assert epic != null;
+                    id = epic.getId();
+                    tasksManager.createEpicFromFile(epic, id);
+                } else if (type.equalsIgnoreCase("SUBTASK")) {
+                    SubTask subTask = (SubTask) fromString(line, tasksManager);
+                    assert subTask != null;
+                    id = subTask.getId();
+                    tasksManager.createSubtaskFromFile(subTask, id);
+                }
+            } else {
+                historyLine = line;
+            }
+        }
+        List<Integer> idOfTasks = historyFromString(historyLine);
+        for (Integer idHistory : idOfTasks) {
+            tasksManager.getHistoryManager().add(allTasks(idHistory, tasksManager));
+
+        }
         return tasksManager;
     }
+
 
     private static Task allTasks(int id, InMemoryTaskManager inMemoryTaskManager) {
         Task task = inMemoryTaskManager.getTaskStorage().get(id);
@@ -276,17 +261,15 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
      * @return задачу
      */
     private static Task fromString(String value, FileBackedTasksManager fileBacked) {
-        String[] parts = value.split(",");
-        int epicId = 0;
+        String[] parts = value.split(",", 6);
+
         int id = Integer.parseInt(parts[0]);
         TypeOfTask type = TypeOfTask.valueOf(parts[1]);
         String name = parts[2];
         String description = parts[3];
         StatusOfTask status = StatusOfTask.valueOf(parts[4]);
+        String epicId = parts[5].trim();
 
-        if (!parts[5].equals(" ")) {
-            epicId = Integer.parseInt(parts[5].trim());
-        }
 
         switch (type) {
             case TASK:
@@ -309,7 +292,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 subTask.setName(name);
                 subTask.setStatus(status);
                 subTask.setDescription(description);
-                subTask.setEpicTask(fileBacked.getEpicTaskStorage().get(epicId));
+                subTask.setEpicTask(fileBacked.getEpicTaskStorage().get(Integer.parseInt(epicId)));
+                subTask.getEpicTask().getSubTasks().add(subTask);
                 return subTask;
             default:
                 return null;
@@ -324,166 +308,160 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
      * @return список id задач из истории просмотров
      */
     private static List<Integer> historyFromString(String value) {
-            String[] idOfTasks = value.split(",");
-            List<Integer> listId = new ArrayList<>();
-            for (String id : idOfTasks) {
-                if (!id.equals("")) {
-                    listId.add(Integer.parseInt(id));
-                }
+        String[] idOfTasks = value.split(",");
+        List<Integer> listId = new ArrayList<>();
+        for (String id : idOfTasks) {
+            if (!id.equals("")) {
+                listId.add(Integer.parseInt(id));
             }
-            return listId;
         }
+        return listId;
+    }
 
 
-        /**
-         * метод создает задачу из файла с ее первоначальным номером
-         *
-         * @param task задача из файла
-         * @param id   номер из файла
-         */
-        public void createTaskFromFile (Task task,int id){
-            getTaskStorage().put(id, task);
+    /**
+     * метод создает задачу из файла с ее первоначальным номером
+     *
+     * @param task задача из файла
+     * @param id   номер из файла
+     */
+    public void createTaskFromFile(Task task, int id) {
+        getTaskStorage().put(id, task);
+    }
+
+
+    /**
+     * метод создает эпик из файла с ее первоначальным номером
+     *
+     * @param epic задача из файла
+     * @param id   номер из файла
+     */
+    public void createEpicFromFile(Epic epic, int id) {
+        getEpicTaskStorage().put(id, epic);
+    }
+
+
+    /**
+     * метод создает сабтаску из файла с ее первоначальным номером
+     *
+     * @param subtask задача из файла
+     * @param id      номер из файла
+     */
+    public void createSubtaskFromFile(SubTask subtask, int id) {
+        getSubTasksStorage().put(id, subtask);
+    }
+
+    /**
+     * Метод проверяет есть ли в мапах id. Если есть - то он его увеличивает пока не найдет свободный
+     *
+     * @return уникальный id
+     */
+    private int setActualId() {
+        int uniqueId = 1;
+        while (getTaskStorage().containsKey(uniqueId) || getEpicTaskStorage().containsKey(uniqueId) ||
+                getSubTasksStorage().containsKey(uniqueId)) {
+            uniqueId++;
         }
+        return uniqueId;
+    }
 
 
-        /**
-         * метод создает эпик из файла с ее первоначальным номером
-         *
-         * @param epic задача из файла
-         * @param id   номер из файла
-         */
-        public void createEpicFromFile (Epic epic,int id){
-            getEpicTaskStorage().put(id, epic);
-        }
+    @Override
+    public void createTask(Task task) {
+        task.setId(setActualId());
+        getTaskStorage().put(setActualId(), task);
+        save();
+
+    }
+
+    @Override
+    public void createEpic(Epic epic) {
+        epic.setId(setActualId());
+        getEpicTaskStorage().put(setActualId(), epic);
+        save();
+    }
+
+    @Override
+    public void createSubtask(SubTask subtask) {
+        subtask.setId(setActualId());
+        getSubTasksStorage().put(setActualId(), subtask);
+        save();
+    }
+
+    @Override
+    public void deleteAllTasks() {
+        super.deleteAllTasks();
+        save();
+    }
+
+    @Override
+    public void deleteAllEpicTasks() {
+        super.deleteAllEpicTasks();
+        save();
+    }
+
+    @Override
+    public void deleteAllSubTasks() {
+        super.deleteAllSubTasks();
+        save();
+    }
+
+    @Override
+    public Task getTaskById(int id) {
+        save();
+        return super.getTaskById(id);
+
+    }
+
+    @Override
+    public Epic getEpicTaskById(int id) {
+        save();
+        return super.getEpicTaskById(id);
+    }
+
+    @Override
+    public SubTask getSubTaskById(int id) {
+        SubTask task = super.getSubTaskById(id);
+        save();
+        return task;
+    }
 
 
-        /**
-         * метод создает сабтаску из файла с ее первоначальным номером
-         *
-         * @param subtask задача из файла
-         * @param id      номер из файла
-         */
-        public void createSubtaskFromFile (SubTask subtask,int id){
-            getSubTasksStorage().put(id, subtask);
-        }
+    @Override
+    public void updateTask(Task task) {
+        super.updateTask(task);
+        save();
+    }
 
-        /**
-         * Метод проверяет есть ли в мапах id. Если есть - то он его увеличивает пока не найдет свободный
-         *
-         * @return уникальный id
-         */
-        private int setActualId () {
-            int uniqueId = 1;
-            while (getTaskStorage().containsKey(uniqueId) || getEpicTaskStorage().containsKey(uniqueId) ||
-                    getSubTasksStorage().containsKey(uniqueId)) {
-                uniqueId++;
-            }
-            return uniqueId;
-        }
+    @Override
+    public void updateEpicTask(Epic epic) {
+        super.updateEpicTask(epic);
+        save();
+    }
 
+    @Override
+    public void updateSubTask(SubTask subTask) {
+        super.updateSubTask(subTask);
+        save();
+    }
 
-        @Override
-        public void createTask (Task task){
-            task.setId(setActualId());
-            getTaskStorage().put(setActualId(), task);
-            save();
+    @Override
+    public void deleteTaskById(int id) {
+        super.deleteTaskById(id);
+        save();
+    }
 
-        }
+    @Override
+    public void deleteEpicTaskById(int id) {
+        super.deleteEpicTaskById(id);
+        save();
+    }
 
-        @Override
-        public void createEpic (Epic epic){
-            epic.setId(setActualId());
-            getEpicTaskStorage().put(setActualId(), epic);
-            save();
-        }
-
-        @Override
-        public void createSubtask (SubTask subtask){
-            subtask.setId(setActualId());
-            getSubTasksStorage().put(setActualId(), subtask);
-            save();
-        }
-
-        @Override
-        public void deleteAllTasks () {
-            super.deleteAllTasks();
-            save();
-        }
-
-        @Override
-        public void deleteAllEpicTasks () {
-            super.deleteAllEpicTasks();
-            save();
-        }
-
-        @Override
-        public void deleteAllSubTasks () {
-            super.deleteAllSubTasks();
-            save();
-        }
-
-        @Override
-        public Task getTaskById (int id){
-            save();
-            return super.getTaskById(id);
-
-        }
-
-        @Override
-        public Epic getEpicTaskById (int id){
-            save();
-            return super.getEpicTaskById(id);
-        }
-
-        @Override
-        public SubTask getSubTaskById (int id){
-            save();
-            return super.getSubTaskById(id);
-        }
-
-        @Override
-        public ArrayList<SubTask> getSubtasksOfEpic (int id){
-            //save();
-            save();
-            return super.getSubtasksOfEpic(id);
-        }
-
-
-        @Override
-        public void updateTask (Task task){
-            super.updateTask(task);
-            save();
-        }
-
-        @Override
-        public void updateEpicTask (Epic epic){
-            super.updateEpicTask(epic);
-            save();
-        }
-
-        @Override
-        public void updateSubTask (SubTask subTask){
-            super.updateSubTask(subTask);
-            save();
-        }
-
-        @Override
-        public void deleteTaskById ( int id){
-            super.deleteTaskById(id);
-            save();
-        }
-
-        @Override
-        public void deleteEpicTaskById ( int id){
-            super.deleteEpicTaskById(id);
-            save();
-        }
-
-        @Override
-        public void deleteSubTaskById ( int id){
-            super.deleteSubTaskById(id);
-            save();
-        }
+    @Override
+    public void deleteSubTaskById(int id) {
+        super.deleteSubTaskById(id);
+        save();
+    }
 
 }
 

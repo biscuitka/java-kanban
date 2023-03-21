@@ -7,18 +7,9 @@ import java.io.File;
  */
 public class Managers {
 
-
-    /*
     public static TaskManager getDefault() {
         return new InMemoryTaskManager();
     }
-    */
-
-    public static FileBackedTasksManager getDefault() {
-        return FileBackedTasksManager.
-                loadFromFile(new File("history.csv"));
-    }
-
 
     /**
      * @return возвращает объект - историю просмотров

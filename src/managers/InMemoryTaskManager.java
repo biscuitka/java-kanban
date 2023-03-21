@@ -10,12 +10,24 @@ import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
     private static int id = 1;
-    private final HashMap<Integer, Task> taskStorage = new HashMap<>();
-    private final HashMap<Integer, Epic> epicTaskStorage = new HashMap<>();
-    private final HashMap<Integer, SubTask> subTasksStorage = new HashMap<>();
+    protected final HashMap<Integer, Task> taskStorage = new HashMap<>();
+    protected final HashMap<Integer, Epic> epicTaskStorage = new HashMap<>();
+    protected final HashMap<Integer, SubTask> subTasksStorage = new HashMap<>();
     private final HistoryManager historyManager = Managers.getDefaultHistory();
 
-
+    /**
+     * Метод проверяет есть ли в мапах id. Если есть - то он его увеличивает пока не найдет свободный
+     *
+     * @return уникальный id
+     */
+    protected int setActualId() {
+        int uniqueId = 1;
+        while (taskStorage.containsKey(uniqueId) || epicTaskStorage.containsKey(uniqueId)
+                || subTasksStorage.containsKey(uniqueId)) {
+            uniqueId++;
+        }
+        return uniqueId;
+    }
     /**
      * метод по созданию простых задач
      *
@@ -157,7 +169,7 @@ public class InMemoryTaskManager implements TaskManager {
      */
     @Override
     public ArrayList<SubTask> getSubtasksOfEpic(int id) {
-        return getEpicTaskById(id).getSubTasks();
+        return epicTaskStorage.get(id).getSubTasks();
     }
 
     /**
@@ -257,18 +269,6 @@ public class InMemoryTaskManager implements TaskManager {
 
     public HistoryManager getHistoryManager() {
         return historyManager;
-    }
-
-    public HashMap<Integer, Task> getTaskStorage() {
-        return taskStorage;
-    }
-
-    public HashMap<Integer, Epic> getEpicTaskStorage() {
-        return epicTaskStorage;
-    }
-
-    public HashMap<Integer, SubTask> getSubTasksStorage() {
-        return subTasksStorage;
     }
 }
 

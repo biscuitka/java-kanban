@@ -161,11 +161,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         try (Writer fileWriter = new FileWriter(file, StandardCharsets.UTF_8)) {
             fileWriter.write(FIRST_lINE);
 
-            /*getListOfTasks().forEach(task -> fileWriter.write(task.toStringInFile() + "\n"));
-            попыталась так, не совсем понимаю как это должно выглядеть без цикла. В таком случае выходит надо
-            каждый раз оборачивать в try-catch? Но тогда конструкция будет более громоздкой.
-             */
-
             for (Task task : getListOfTasks()) {
                 fileWriter.write(task.toStringInFile() + "\n");
             }
@@ -236,26 +231,22 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
         List<Integer> idOfTasks = historyFromString(historyLine);
         for (Integer idHistory : idOfTasks) {
-            tasksManager.getHistoryManager().add(giveAllTasks(idHistory, tasksManager));
+            tasksManager.addTaskToHistoryById(idHistory);
         }
         return tasksManager;
     }
 
 
-    private static Task giveAllTasks(int id, InMemoryTaskManager inMemoryTaskManager) {
-
-        if (inMemoryTaskManager.taskStorage.containsKey(id)) {
-            return inMemoryTaskManager.taskStorage.get(id);
+    private void addTaskToHistoryById(int id) {
+        if (taskStorage.containsKey(id)) {
+            getTaskById(id);
         }
-
-        if (inMemoryTaskManager.epicTaskStorage.containsKey(id)) {
-            return inMemoryTaskManager.epicTaskStorage.get(id);
+        if (epicTaskStorage.containsKey(id)) {
+            getEpicTaskById(id);
         }
-
-        if (inMemoryTaskManager.subTasksStorage.containsKey(id)) {
-            return inMemoryTaskManager.subTasksStorage.get(id);
+        if (subTasksStorage.containsKey(id)) {
+            getSubTaskById(id);
         }
-
         throw new RuntimeException("Задача с запрошенным Id не найдена");
     }
 

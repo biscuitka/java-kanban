@@ -6,4 +6,4 @@ id,type,name,description,status,epic
 4,SUBTASK,Подзадача1 эпика1,описание подзадачи1,NEW,3
 5,SUBTASK,подзадача2 эпика1,описание подзадачи2,NEW,3
 
-2,3
+2,6

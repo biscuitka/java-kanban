@@ -4,23 +4,30 @@ import tasks.Epic;
 import tasks.SubTask;
 import tasks.Task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
-    private static int id = 1;
     protected final HashMap<Integer, Task> taskStorage = new HashMap<>();
     protected final HashMap<Integer, Epic> epicTaskStorage = new HashMap<>();
     protected final HashMap<Integer, SubTask> subTasksStorage = new HashMap<>();
     private final HistoryManager historyManager = Managers.getDefaultHistory();
+
+
+    /**
+     * сортирует задачи по StartTime
+     */
+    private final Comparator<Task> taskTimeComparator = Comparator.comparing(task -> task.getStartTime());
+    /**
+     * хранит заранее отсортированные задачи
+     */
+    protected Set<Task> prioritizedTasks = new TreeSet<>(taskTimeComparator);
 
     /**
      * Метод проверяет есть ли в мапах id. Если есть - то он его увеличивает пока не найдет свободный
      *
      * @return уникальный id
      */
-    protected int setActualId() {
+    private int setUniqueId() {
         int uniqueId = 1;
         while (taskStorage.containsKey(uniqueId) || epicTaskStorage.containsKey(uniqueId)
                 || subTasksStorage.containsKey(uniqueId)) {
@@ -28,16 +35,24 @@ public class InMemoryTaskManager implements TaskManager {
         }
         return uniqueId;
     }
+
     /**
      * метод по созданию простых задач
      *
      * @param task принимает простую задачу
      */
     @Override
-    public void createTask(Task task) {
-        task.setId(id++);
+    public int createTask(Task task) {
+        task.setId(setUniqueId());
+        if (isTimeIntersection(task)) {
+            throw new TimeIntersectionException("Пересечение по времени с другими задачами");
+        }
+        prioritizedTasks.add(task);
         taskStorage.put(task.getId(), task);
+
+        return task.getId();
     }
+
 
     /**
      * метод по созданию больших задач
@@ -45,9 +60,10 @@ public class InMemoryTaskManager implements TaskManager {
      * @param epic принимает большую задачу
      */
     @Override
-    public void createEpic(Epic epic) {
-        epic.setId(id++);
+    public int createEpic(Epic epic) {
+        epic.setId(setUniqueId());
         epicTaskStorage.put(epic.getId(), epic);
+        return epic.getId();
     }
 
     /**
@@ -56,9 +72,14 @@ public class InMemoryTaskManager implements TaskManager {
      * @param subtask принимает подзадачу
      */
     @Override
-    public void createSubtask(SubTask subtask) {
-        subtask.setId(id++);
+    public int createSubtask(SubTask subtask) {
+        subtask.setId(setUniqueId());
+        if (isTimeIntersection(subtask)) {
+            throw new TimeIntersectionException("Пересечение по времени с другими задачами");
+        }
         subTasksStorage.put(subtask.getId(), subtask);
+        prioritizedTasks.add(subtask);
+        return subtask.getId();
     }
 
     /**
@@ -97,6 +118,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllTasks() {
         taskStorage.clear();
+        prioritizedTasks.removeIf(task -> TypeOfTask.TASK == task.getType());
     }
 
     /**
@@ -114,6 +136,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllSubTasks() {
         subTasksStorage.clear();
+        prioritizedTasks.removeIf(task -> TypeOfTask.SUBTASK == task.getType());
         for (Epic epic : epicTaskStorage.values()) {
             epic.getSubTasks().clear();
         }
@@ -179,6 +202,10 @@ public class InMemoryTaskManager implements TaskManager {
      */
     @Override
     public void updateTask(Task task) {
+        if (isTimeIntersection(task)) {
+            throw new TimeIntersectionException("Пересечение по времени с другими задачами");
+        }
+        prioritizedTasks.add(task);
         taskStorage.put(task.getId(), task);
     }
 
@@ -199,6 +226,10 @@ public class InMemoryTaskManager implements TaskManager {
      */
     @Override
     public void updateSubTask(SubTask subTask) {
+        if (isTimeIntersection(subTask)) {
+            throw new TimeIntersectionException("Пересечение по времени с другими задачами");
+        }
+        prioritizedTasks.add(subTask);
         subTasksStorage.put(subTask.getId(), subTask);
 
         Epic epic = subTask.getEpicTask();
@@ -220,8 +251,11 @@ public class InMemoryTaskManager implements TaskManager {
      */
     @Override
     public void deleteTaskById(int id) {
-        taskStorage.remove(id);
-        historyManager.remove(id); 
+        if (taskStorage.containsKey(id)) {
+            prioritizedTasks.remove(taskStorage.get(id));
+            taskStorage.remove(id);
+            historyManager.remove(id);
+        }
     }
 
     /**
@@ -233,9 +267,11 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteEpicTaskById(int id) {
         if (epicTaskStorage.containsKey(id)) {
             Epic epic = getEpicTaskById(id);
+            epic.getSubTasks().clear();
             for (SubTask subTask : epic.getSubTasks()) {
                 subTasksStorage.remove(subTask.getId());
                 historyManager.remove(subTask.getId());
+                prioritizedTasks.remove(subTask);
             }
             epicTaskStorage.remove(id);
             historyManager.remove(id);
@@ -252,6 +288,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (subTasksStorage.containsKey(id)) {
             SubTask subTask = getSubTaskById(id);
             subTask.getEpicTask().getSubTasks().remove(subTask);
+            prioritizedTasks.remove(subTasksStorage.get(id));
             subTasksStorage.remove(id);
             historyManager.remove(id);
         }
@@ -270,5 +307,38 @@ public class InMemoryTaskManager implements TaskManager {
     public HistoryManager getHistoryManager() {
         return historyManager;
     }
+
+
+    /**
+     * возвращает список задач и подзадач в заданном порядке
+     *
+     * @return список
+     */
+    public List<Task> getPrioritizedTasks() {
+        return new ArrayList<>(prioritizedTasks);
+    }
+
+    /**
+     * проверяет, что задачи и подзадачи не пересекаются во времени
+     */
+    public boolean isTimeIntersection(Task task) { //добавить валидацию во время создания или изм-я задач
+        List<Task> tasks = getPrioritizedTasks();
+        boolean isCross = false;
+        if (!tasks.isEmpty()) {
+            for (Task priorityTask : tasks) {
+                if (priorityTask.getStartTime() != null && priorityTask.getEndTime() != null) {
+                    if (task.getStartTime().isBefore(priorityTask.getStartTime())
+                            && (task.getEndTime().isAfter(priorityTask.getStartTime()))) {
+                        isCross = true;
+                    } else if (task.getStartTime().isAfter(priorityTask.getStartTime())
+                            && (task.getEndTime().isBefore(priorityTask.getEndTime()))) {
+                        isCross = true;
+                    }
+                }
+            }
+        }
+        return isCross;
+    }
+
 }
 

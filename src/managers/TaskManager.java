@@ -19,21 +19,21 @@ public interface TaskManager {
      *
      * @param task принимает простую задачу
      */
-    void createTask(Task task);
+    int createTask(Task task);
 
     /**
      * метод по созданию больших задач
      *
      * @param epic принимает большую задачу
      */
-    void createEpic(Epic epic);
+    int createEpic(Epic epic);
 
     /**
      * метод по созданию подзадач для эпиков
      *
      * @param subtask принимает подзадачу
      */
-    void createSubtask(SubTask subtask);
+    int createSubtask(SubTask subtask);
 
     /**
      * метод по получению списка всех задач

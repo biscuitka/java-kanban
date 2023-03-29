@@ -1,14 +1,11 @@
 
-import managers.FileBackedTasksManager;
 import managers.Managers;
 import managers.TaskManager;
 import tasks.Epic;
-import tasks.StatusOfTask;
 import tasks.SubTask;
 import tasks.Task;
 
-import java.io.File;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 
 
 public class Main {
@@ -23,11 +20,15 @@ public class Main {
         Task taskOne = new Task();
         taskOne.setName("простая задача1");
         taskOne.setDescription("описание задачи1");
+        taskOne.setStartTime(LocalDateTime.now());
+        taskOne.setDuration(10);
         manager.createTask(taskOne);
 
         Task taskTwo = new Task();
         taskTwo.setName("простая задача2");
         taskTwo.setDescription("описание задачи2");
+        taskTwo.setStartTime(LocalDateTime.now().plusMinutes(15));
+        taskTwo.setDuration(20);
         manager.createTask(taskTwo);
 
         System.out.println("тест создания tasks- " + "\n" + taskOne + "\n" + taskTwo);
@@ -41,6 +42,8 @@ public class Main {
         SubTask subtaskOne = new SubTask();
         subtaskOne.setName("Подзадача1 эпика1");
         subtaskOne.setDescription("описание подзадачи1");
+        subtaskOne.setStartTime(LocalDateTime.now().plusMinutes(10));
+        subtaskOne.setDuration(20);
         manager.createSubtask(subtaskOne);
         subtaskOne.setEpicTask(epicTaskOne);
         epicTaskOne.getSubTasks().add(subtaskOne);

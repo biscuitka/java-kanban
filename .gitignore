@@ -1,5 +1,6 @@
 # Compiled class file
 *.class
+history.csv
 
 # Log file
 *.log

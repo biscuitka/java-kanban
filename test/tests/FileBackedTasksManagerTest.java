@@ -43,7 +43,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<InMemoryTaskManager> {
     }
 
     @Test
-    public void shouldSaveFromFile(){
+    public void shouldSaveToFile() {
         Task task = createTestTask();
         taskManager.createTask(task);
         Epic epic = createTestEpic();
@@ -52,7 +52,11 @@ class FileBackedTasksManagerTest extends TaskManagerTest<InMemoryTaskManager> {
         subTask.setEpicTask(epic);
         epic.getSubTasks().add(subTask);
         taskManager.createSubtask(subTask);
+        assertEquals(List.of(task), taskManager.getListOfTasks(), "Задачи не записались");
+        assertEquals(List.of(epic), taskManager.getListOfEpicTasks(), "Эпики не записались");
+        assertEquals(List.of(subTask), taskManager.getListOfSubTasks(), "Сабтаски не записались");
     }
+
     @Test
     public void shouldSaveAndLoadFromFile() {
         Task task = createTestTask();

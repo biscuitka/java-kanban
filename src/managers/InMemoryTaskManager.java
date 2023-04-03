@@ -44,10 +44,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public int createTask(Task task) {
         task.setId(setUniqueId());
-        if (isTimeIntersection(task)) {
-            throw new TimeIntersectionException("Пересечение по времени с другими задачами");
-        }
-        prioritizedTasks.add(task);
+        addToPrioritizedTasks(task);
         taskStorage.put(task.getId(), task);
 
         return task.getId();
@@ -74,11 +71,8 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public int createSubtask(SubTask subtask) {
         subtask.setId(setUniqueId());
-        if (isTimeIntersection(subtask)) {
-            throw new TimeIntersectionException("Пересечение по времени с другими задачами");
-        }
+        addToPrioritizedTasks(subtask);
         subTasksStorage.put(subtask.getId(), subtask);
-        prioritizedTasks.add(subtask);
         return subtask.getId();
     }
 
@@ -128,6 +122,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteAllEpicTasks() {
         epicTaskStorage.clear();
         subTasksStorage.clear();
+        prioritizedTasks.removeIf(task -> TypeOfTask.SUBTASK == task.getType());
     }
 
     /**
@@ -317,27 +312,33 @@ public class InMemoryTaskManager implements TaskManager {
     public List<Task> getPrioritizedTasks() {
         return new ArrayList<>(prioritizedTasks);
     }
+    private void addToPrioritizedTasks(Task task){
+        if (isTimeIntersection(task)) {
+            throw new TimeIntersectionException("Пересечение по времени с другими задачами");
+        }
+        prioritizedTasks.add(task);
+    }
 
     /**
      * проверяет, что задачи и подзадачи не пересекаются во времени
      */
-    public boolean isTimeIntersection(Task task) { //добавить валидацию во время создания или изм-я задач
+    public boolean isTimeIntersection(Task task) {
         List<Task> tasks = getPrioritizedTasks();
-        boolean isCross = false;
         if (!tasks.isEmpty()) {
             for (Task priorityTask : tasks) {
                 if (priorityTask.getStartTime() != null && priorityTask.getEndTime() != null) {
                     if (task.getStartTime().isBefore(priorityTask.getStartTime())
                             && (task.getEndTime().isAfter(priorityTask.getStartTime()))) {
-                        isCross = true;
-                    } else if (task.getStartTime().isAfter(priorityTask.getStartTime())
+                        return true; // подправила так, надеюсь ты об этом писал=)
+                    }
+                    if (task.getStartTime().isAfter(priorityTask.getStartTime())
                             && (task.getEndTime().isBefore(priorityTask.getEndTime()))) {
-                        isCross = true;
+                       return true;
                     }
                 }
             }
         }
-        return isCross;
+        return false;
     }
 
 }

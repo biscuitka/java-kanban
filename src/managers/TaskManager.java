@@ -1,11 +1,10 @@
 package managers;
 
 import tasks.Epic;
-import tasks.SubTask;
+import tasks.Subtask;
 import tasks.Task;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -33,7 +32,7 @@ public interface TaskManager {
      *
      * @param subtask принимает подзадачу
      */
-    int createSubtask(SubTask subtask);
+    int createSubtask(Subtask subtask);
 
     /**
      * метод по получению списка всех задач
@@ -84,14 +83,14 @@ public interface TaskManager {
      *
      * @param id принимает id по которому нужно получить подзадачу
      */
-    SubTask getSubTaskById(int id);
+    Subtask getSubTaskById(int id);
 
     /**
      * метод для получения списка всех подзадач определённого эпика.
      *
      * @param id принимает номер эпика
      */
-    ArrayList<SubTask> getSubtasksOfEpic(int id);
+    ArrayList<Subtask> getSubtasksOfEpic(int id);
 
     /**
      * метод по обновлению задачи
@@ -105,14 +104,14 @@ public interface TaskManager {
      *
      * @param epic обновленный эпик
      */
-    void updateEpicTask(Epic epic);
+    void updateEpic(Epic epic);
 
     /**
      * метод по обновлению подзадачи
      *
      * @param subTask обновленная подзадача
      */
-    void updateSubTask(SubTask subTask);
+    void updateSubTask(Subtask subTask);
 
 
     /**
@@ -139,5 +138,7 @@ public interface TaskManager {
     List<Task> getHistory();
 
 
+    List<Task> getPrioritizedTasks();
 }
+
 

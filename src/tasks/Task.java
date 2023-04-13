@@ -64,7 +64,7 @@ public class Task {
     public String toStringInFile() {
         String format = "%s,%s,%s,%s,%s,%s,%s,%s";
         return String.format(format, getId(), type, getName(), getDescription(), getStatus(),
-                getStartTime().toString(), getDuration()," ");
+                getStartTime().format(formatter), getDuration()," ");
     }
 
     public int getId() {

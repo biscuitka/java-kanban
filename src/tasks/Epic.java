@@ -1,27 +1,31 @@
 package tasks;
 
+import managers.Managers;
+import managers.TaskManager;
 import managers.TypeOfTask;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * класс наследует у tasks.Task и представляет большие задачи
  */
 public class Epic extends Task {
-    private ArrayList<SubTask> subTasks = new ArrayList<>();
+    private ArrayList<Integer> subTasksIds = new ArrayList<>();
 
     public Epic() {
         setType(TypeOfTask.EPIC);
     }
 
-    public ArrayList<SubTask> getSubTasks() {
-        return subTasks;
+    public ArrayList<Integer> getSubTasksIds() {
+        return subTasksIds;
     }
 
-    public void setSubTasks(ArrayList<SubTask> subTasks) {
-        this.subTasks = subTasks;
+    public void setSubTasksIds(ArrayList<Integer> subTasksIds) {
+        this.subTasksIds = subTasksIds;
     }
 
 
@@ -30,16 +34,22 @@ public class Epic extends Task {
      *
      * @return статус эпика
      */
-    @Override
-    public StatusOfTask getStatus() {
+
+    public void updateStatus(TaskManager taskManager) {
         boolean isNewStatus = true;
         boolean isDoneStatus = true;
-
-        if (subTasks.isEmpty()) {
-            return StatusOfTask.NEW;
+        List<Subtask> subtasks = new ArrayList<>(Collections.emptyList());
+        if (subTasksIds.isEmpty()) {
+            setStatus(StatusOfTask.NEW);
+            return;
         }
 
-        for (Task subTask : subTasks) {
+        for (Integer id : getSubTasksIds()) {
+            Subtask subtask = taskManager.getSubTaskById(id);
+            subtasks.add(subtask);
+
+        }
+        for (Task subTask : subtasks) {
             if (subTask.getStatus() != StatusOfTask.NEW) {
                 isNewStatus = false;
             }
@@ -48,15 +58,18 @@ public class Epic extends Task {
             }
         }
         if (isNewStatus && isDoneStatus) {
-            return StatusOfTask.IN_PROGRESS;
+            setStatus(StatusOfTask.IN_PROGRESS);
+            return;
         }
         if (isNewStatus) {
-            return StatusOfTask.NEW;
+            setStatus(StatusOfTask.NEW);
+            return;
         }
         if (isDoneStatus) {
-            return StatusOfTask.DONE;
+            setStatus(StatusOfTask.DONE);
+            return;
         }
-        return StatusOfTask.IN_PROGRESS;
+        setStatus(StatusOfTask.IN_PROGRESS);
     }
 
 
@@ -67,48 +80,49 @@ public class Epic extends Task {
                 "name='" + getName() + '\'' +
                 ", description='" + getDescription() + '\'' +
                 ", status=" + getStatus() + '\'' +
-                ", subTasks=" + subTasks +
+                ", subTasks=" + getSubTasksIds() +
                 '}';
     }
+
     @Override
     public String toStringInFile() {
         String format = "%s,%s,%s,%s,%s,%s";
         return String.format(format, getId(), getType(), getName(), getDescription(), getStatus(), " ");
 
     }
-    @Override
-    public LocalDateTime getEndTime() {
-        if (subTasks.size() == 0) {
+
+    public LocalDateTime getEndTime(TaskManager taskManager) {
+        if (subTasksIds.size() == 0) {
             return null;
         }
-        LocalDateTime endTime = subTasks.get(0).getEndTime();
-        for (SubTask subTask : subTasks) {
+        LocalDateTime endTime = taskManager.getSubtasksOfEpic(getId()).get(0).getEndTime();
+        for (Subtask subTask : taskManager.getSubtasksOfEpic(getId())) {
             if (subTask.getEndTime().isAfter(endTime))
                 endTime = subTask.getEndTime();
         }
         return endTime;
     }
 
-    @Override
-    public LocalDateTime getStartTime() {
-        if (subTasks.size() == 0) {
+
+    public LocalDateTime getStartTime(TaskManager taskManager) {
+        if (subTasksIds.size() == 0) {
             return null;
         }
-        LocalDateTime startTime = subTasks.get(0).getStartTime();
-        for (SubTask subTask : subTasks) {
-            if (subTask.getStartTime().isBefore(startTime)){
+        LocalDateTime startTime = taskManager.getSubtasksOfEpic(getId()).get(0).getStartTime();
+        for (Subtask subTask : taskManager.getSubtasksOfEpic(getId())) {
+            if (subTask.getStartTime().isBefore(startTime)) {
                 startTime = subTask.getStartTime();
             }
         }
         return startTime;
     }
 
-    @Override
-    public long getDuration() {
-        if (subTasks.size() == 0) {
+
+    public long getDuration(TaskManager taskManager) {
+        if (subTasksIds.size() == 0) {
             return 0;
         }
-        return ChronoUnit.MINUTES.between(getStartTime(), getEndTime());
+        return ChronoUnit.MINUTES.between(getStartTime(taskManager), getEndTime(taskManager));
     }
 
 }

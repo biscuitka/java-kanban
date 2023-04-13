@@ -6,10 +6,10 @@ import managers.TypeOfTask;
  * класс наследует у tasks.Task и представляет подзадачи Эпика,
  * содержит новое поле ссылку на эпик
  */
-public class SubTask extends Task {
-    private Epic epicTask;
+public class Subtask extends Task {
+    private int epicId;
 
-    public SubTask() {
+    public Subtask() {
         setType(TypeOfTask.SUBTASK);
     }
 
@@ -17,16 +17,15 @@ public class SubTask extends Task {
     public String toStringInFile() {
         String format = "%s,%s,%s,%s,%s,%s,%s,%s";
         return String.format(format,getId(),getType(),getName(),getDescription(),getStatus(),
-                getStartTime().format(formatter), getDuration(),epicTask.getId());
-    }
-
-    public Epic getEpicTask() {
-        return epicTask;
-    }
-
-    public void setEpicTask(Epic epicTask) {
-        this.epicTask = epicTask;
+                getStartTime().format(formatter), getDuration(),getEpicId());
     }
 
 
+    public int getEpicId() {
+        return epicId;
+    }
+
+    public void setEpicId(int epicId) {
+        this.epicId = epicId;
+    }
 }

@@ -2,12 +2,11 @@ package tests;
 
 import managers.FileBackedTasksManager;
 import managers.InMemoryTaskManager;
-import managers.ManagerSaveException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tasks.Epic;
-import tasks.SubTask;
+import tasks.Subtask;
 import tasks.Task;
 
 import java.io.File;
@@ -48,9 +47,8 @@ class FileBackedTasksManagerTest extends TaskManagerTest<InMemoryTaskManager> {
         taskManager.createTask(task);
         Epic epic = createTestEpic();
         taskManager.createEpic(epic);
-        SubTask subTask = createTestSubtask();
-        subTask.setEpicTask(epic);
-        epic.getSubTasks().add(subTask);
+        Subtask subTask = createTestSubtask();
+        subTask.setEpicId(epic.getId());
         taskManager.createSubtask(subTask);
         assertEquals(List.of(task), taskManager.getListOfTasks(), "Задачи не записались");
         assertEquals(List.of(epic), taskManager.getListOfEpicTasks(), "Эпики не записались");
@@ -63,9 +61,8 @@ class FileBackedTasksManagerTest extends TaskManagerTest<InMemoryTaskManager> {
         taskManager.createTask(task);
         Epic epic = createTestEpic();
         taskManager.createEpic(epic);
-        SubTask subTask = createTestSubtask();
-        subTask.setEpicTask(epic);
-        epic.getSubTasks().add(subTask);
+        Subtask subTask = createTestSubtask();
+        subTask.setEpicId(epic.getId());
         taskManager.createSubtask(subTask);
         FileBackedTasksManager loadManager = loadFromFile(file);
         assertEquals(List.of(task), loadManager.getListOfTasks(), "Задачи не выгрузились");
@@ -91,9 +88,9 @@ class FileBackedTasksManagerTest extends TaskManagerTest<InMemoryTaskManager> {
         taskManager.createTask(task);
         Epic epic = createTestEpic();
         taskManager.createEpic(epic);
+        taskManager.getTaskById(task.getId());
+        taskManager.getEpicTaskById(epic.getId());
         FileBackedTasksManager loadManager = loadFromFile(file);
-        loadManager.getTaskById(task.getId());
-        loadManager.getEpicTaskById(epic.getId());
         assertEquals(2, loadManager.getHistory().size(), "Список истории не совпадает");
     }
 

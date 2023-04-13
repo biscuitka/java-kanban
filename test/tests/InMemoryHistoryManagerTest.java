@@ -5,7 +5,7 @@ import managers.InMemoryHistoryManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tasks.Epic;
-import tasks.SubTask;
+import tasks.Subtask;
 import tasks.Task;
 
 import java.util.Collections;
@@ -39,8 +39,8 @@ public class InMemoryHistoryManagerTest {
         return epicTask;
     }
 
-    protected SubTask createTestSubtask() {
-        SubTask subtask = new SubTask();
+    protected Subtask createTestSubtask() {
+        Subtask subtask = new Subtask();
         subtask.setName("Подзадача эпика");
         subtask.setDescription("описание подзадачи");
         subtask.setId(id++);
@@ -62,7 +62,7 @@ public class InMemoryHistoryManagerTest {
     public void shouldReturnHistoryWithoutDuplicateTask() {
         Task task = createTestTask();
         Epic epic = createTestEpic();
-        SubTask subTask = createTestSubtask();
+        Subtask subTask = createTestSubtask();
         historyManager.add(task);
         historyManager.add(epic);
         historyManager.add(subTask);
@@ -79,8 +79,8 @@ public class InMemoryHistoryManagerTest {
         Task task1 = createTestTask();
         Epic epic = createTestEpic();
         Epic epic1 = createTestEpic();
-        SubTask subTask = createTestSubtask();
-        SubTask subTask1 = createTestSubtask();
+        Subtask subTask = createTestSubtask();
+        Subtask subTask1 = createTestSubtask();
 
         historyManager.add(task);
         historyManager.add(task1);

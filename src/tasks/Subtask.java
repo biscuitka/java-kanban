@@ -17,7 +17,7 @@ public class SubTask extends Task {
     public String toStringInFile() {
         String format = "%s,%s,%s,%s,%s,%s,%s,%s";
         return String.format(format,getId(),getType(),getName(),getDescription(),getStatus(),
-                getStartTime().toString(), getDuration(),epicTask.getId());
+                getStartTime().format(formatter), getDuration(),epicTask.getId());
     }
 
     public Epic getEpicTask() {

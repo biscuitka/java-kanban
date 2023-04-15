@@ -1,5 +1,6 @@
 package api.handlers;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
@@ -21,6 +22,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class EpicHandler implements HttpHandler {
     private final TaskManager taskManager;
+    private final Gson gson = Managers.getGson();
 
     public EpicHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
@@ -36,65 +38,61 @@ public class EpicHandler implements HttpHandler {
         switch (requestMethod) {
             case "GET":
                 if (query == null) {
-                    response = Managers.getGson().toJson(taskManager.getListOfEpicTasks());
+                    response = gson.toJson(taskManager.getListOfEpicTasks());
                 } else {
                     int id = Integer.parseInt(query.split("=")[1]);
                     Epic epic = taskManager.getEpicTaskById(id);
                     if (epic != null) {
-                        response = Managers.getGson().toJson(epic);
+                        response = gson.toJson(epic);
                     } else {
                         codeStatus = 404;
                         response = "Эпик не найден";
                     }
                 }
                 break;
+
             case "POST":
                 Epic epic = null;
-                InputStream inputStream = exchange.getRequestBody(); // извлекли тело запроса
-                String body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8); // создали строку из тела запроса
+                InputStream inputStream = exchange.getRequestBody();
+                String body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
                 JsonElement element = JsonParser.parseString(body);
-                TypeOfTask type = Managers.getGson()
-                        .fromJson(element.getAsJsonObject().get("type"), TypeOfTask.class);
-                if (type.equals(TypeOfTask.EPIC)){
-                    epic = Managers.getGson().fromJson(element, Epic.class);
+                TypeOfTask type = gson.fromJson(element.getAsJsonObject().get("type"), TypeOfTask.class);
+                Integer id = gson.fromJson(element.getAsJsonObject().get("id"), Integer.class);
+                if (type.equals(TypeOfTask.EPIC)) {
+                    epic = gson.fromJson(element, Epic.class);
                 }
-                if (query == null) {
+                if (id == null) {
                     taskManager.createEpic(epic);
                     assert epic != null;
                     response = "Эпик добавлен под id: " + epic.getId();
                 } else {
-                    int id = Integer.parseInt(query.split("=")[1]);
-                    if (taskManager.getListOfEpicTasks().get(id) != null) {
-                        taskManager.updateEpic(epic);
-                        response = "Эпик обновлен";
-                    }
+                    taskManager.updateEpic(epic);
+                    response = "Эпик обновлен";
                 }
                 break;
+
             case "DELETE":
                 if (query == null) {
                     taskManager.deleteAllEpicTasks();
                     response = "Все эпики удалены";
                 } else {
-                    int id =Integer.parseInt(query.split("=")[1]);
-                    if (taskManager.getListOfEpicTasks().get(id) != null) {
-                        taskManager.deleteEpicTaskById(id);
-                        response = "Эпик с id: " + id + " удален";
-                    } else {
-                        codeStatus = 404;
-                        response = "Эпик не найден";
-                    }
+                    int id2 = Integer.parseInt(query.split("=")[1]);
+                    taskManager.deleteEpicTaskById(id2);
+                    response = "Эпик с id: " + id2 + " удален";
                 }
                 break;
+
             default:
                 codeStatus = 405;
                 response = "Некорректный запрос, ожидалось GET/POST/DELETE";
                 break;
         }
 
-        exchange.sendResponseHeaders(codeStatus, 0);
-
         try (OutputStream outputStream = exchange.getResponseBody()) {
+            exchange.sendResponseHeaders(codeStatus, 0);
             outputStream.write(response.getBytes());
+        } catch (IOException exp) {
+            System.out.println("Пустой ответ.");
         }
     }
 }

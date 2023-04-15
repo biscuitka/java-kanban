@@ -1,6 +1,7 @@
 package api;
 
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -17,6 +18,7 @@ import java.util.List;
 public class HttpTaskManager extends FileBackedTasksManager {
 
     private final KVTaskClient kvClient;
+    private final Gson gson = Managers.getGson();
 
     public HttpTaskManager(String url) {
         this.kvClient = new KVTaskClient(url);
@@ -24,10 +26,10 @@ public class HttpTaskManager extends FileBackedTasksManager {
 
     @Override
     public void save() {
-        kvClient.put("tasks", Managers.getGson().toJson(getListOfTasks()));
-        kvClient.put("subtasks", Managers.getGson().toJson(getListOfSubTasks()));
-        kvClient.put("epics", Managers.getGson().toJson(getListOfEpicTasks()));
-        kvClient.put("history", Managers.getGson().toJson(getHistory()));
+        kvClient.put("tasks", gson.toJson(getListOfTasks()));
+        kvClient.put("subtasks", gson.toJson(getListOfSubTasks()));
+        kvClient.put("epics", gson.toJson(getListOfEpicTasks()));
+        kvClient.put("history", gson.toJson(getHistory()));
     }
 
     public void loadFromKVServer() {
@@ -37,19 +39,33 @@ public class HttpTaskManager extends FileBackedTasksManager {
 
         JsonArray taskElements = JsonParser.parseString(kvClient.load("tasks")).getAsJsonArray();
         for (JsonElement element : taskElements) {
-            tasks.add(Managers.getGson().fromJson(element, Task.class));
+            tasks.add(gson.fromJson(element, Task.class));
+        }
+        for (Task task : tasks){
+            createTask(task);
         }
 
         JsonArray subElements = JsonParser.parseString(kvClient.load("subtasks")).getAsJsonArray();
         for (JsonElement element : subElements) {
-            subtasks.add(Managers.getGson().fromJson(element, Subtask.class));
+            subtasks.add(gson.fromJson(element, Subtask.class));
+        }
+        for (Subtask subtask : subtasks){
+            createSubtask(subtask);
         }
 
         JsonArray epicElements = JsonParser.parseString(kvClient.load("epics")).getAsJsonArray();
         for (JsonElement element : epicElements) {
-            epics.add(Managers.getGson().fromJson(element, Epic.class));
+            epics.add(gson.fromJson(element, Epic.class));
+        }
+        for (Epic epic : epics){
+            createEpic(epic);
         }
 
+        String stringHistoryIds = JsonParser.parseString(kvClient.load("history")).getAsString();
+        List<Integer> historyIds = new ArrayList<>(historyFromString(stringHistoryIds));
+        for (Integer id : historyIds) {
+            addTaskToHistoryById(id);
+        }
     }
 
 

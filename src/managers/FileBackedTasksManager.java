@@ -257,7 +257,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
 
-    private void addTaskToHistoryById(int id) {
+    protected void addTaskToHistoryById(int id) {
         if (taskStorage.containsKey(id)) {
             getTaskById(id);
             return;
@@ -316,7 +316,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             default:
                 throw new RuntimeException("Задача с запрошенным Id не найдена");
         }
-        createdTask.setId(java.lang.Integer.parseInt(parts[0]));
+        createdTask.setId(Integer.parseInt(parts[0]));
         createdTask.setName(parts[2]);
         createdTask.setDescription(parts[3]);
         createdTask.setStatus(StatusOfTask.valueOf(parts[4]));
@@ -335,12 +335,12 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
      * @param value строка с историей
      * @return список id задач из истории просмотров
      */
-    private static List<java.lang.Integer> historyFromString(String value) {
+    protected static List<Integer> historyFromString(String value) {
         String[] idOfTasks = value.split(",");
-        List<java.lang.Integer> listId = new ArrayList<>();
+        List<Integer> listId = new ArrayList<>();
         for (String id : idOfTasks) {
             if (!id.equals("")) {
-                listId.add(java.lang.Integer.parseInt(id));
+                listId.add(Integer.parseInt(id));
             }
         }
         return listId;

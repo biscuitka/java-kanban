@@ -8,9 +8,9 @@ import java.net.http.HttpResponse;
 import java.util.Objects;
 
 public class KVTaskClient {
-    private String url;
-    HttpClient client;
-    private String apiToken;
+    private final String url;
+    private final HttpClient client;
+    private final String apiToken;
 
     public KVTaskClient(String url) {
         client = HttpClient.newHttpClient();

@@ -206,11 +206,10 @@ public class InMemoryTaskManager implements TaskManager {
      */
     @Override
     public void updateTask(Task task) {
-        if (isTimeIntersection(task)) {
-            throw new TimeIntersectionException("Пересечение по времени с другими задачами");
+        if (task != null) {
+            addToPrioritizedTasks(task);
+            taskStorage.put(task.getId(), task);
         }
-        prioritizedTasks.add(task);
-        taskStorage.put(task.getId(), task);
     }
 
     /**
@@ -220,7 +219,9 @@ public class InMemoryTaskManager implements TaskManager {
      */
     @Override
     public void updateEpic(Epic epic) {
-        epicTaskStorage.put(epic.getId(), epic);
+        if (epic != null) {
+            epicTaskStorage.put(epic.getId(), epic);
+        }
     }
 
     /**
@@ -230,24 +231,23 @@ public class InMemoryTaskManager implements TaskManager {
      */
     @Override
     public void updateSubTask(Subtask subTask) {
-        if (isTimeIntersection(subTask)) {
-            throw new TimeIntersectionException("Пересечение по времени с другими задачами");
-        }
-        prioritizedTasks.add(subTask);
-        subTasksStorage.put(subTask.getId(), subTask);
+        if (subTask != null) {
+            addToPrioritizedTasks(subTask);
+            subTasksStorage.put(subTask.getId(), subTask);
 
-        Epic epic = epicTaskStorage.get(subTask.getEpicId());
-        List<Subtask> subTasks = getSubtasksOfEpic(epic.getId());
+            Epic epic = epicTaskStorage.get(subTask.getEpicId());
+            List<Subtask> subTasks = getSubtasksOfEpic(epic.getId());
 
-        for (Subtask subTaskOfEpic : subTasks) {
-            if (subTask.getId() == subTaskOfEpic.getId()) {
-                subTasks.remove(subTaskOfEpic);
-                break;
+            for (Subtask subTaskOfEpic : subTasks) {
+                if (subTask.getId() == subTaskOfEpic.getId()) {
+                    subTasks.remove(subTaskOfEpic);
+                    break;
+                }
             }
-        }
-        subTasks.add(subTask);
+            subTasks.add(subTask);
 
-        epicTaskStorage.get(subTask.getEpicId()).updateStatus(this);
+            epicTaskStorage.get(subTask.getEpicId()).updateStatus(this);
+        }
     }
 
     /**
@@ -327,6 +327,7 @@ public class InMemoryTaskManager implements TaskManager {
     public List<Task> getPrioritizedTasks() {
         return new ArrayList<>(prioritizedTasks);
     }
+
     private void addToPrioritizedTasks(Task task){
         if (isTimeIntersection(task)) {
             throw new TimeIntersectionException("Пересечение по времени с другими задачами");

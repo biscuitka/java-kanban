@@ -55,7 +55,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
 
     @Test
-    void shouldCreateTask() throws IOException, InterruptedException {
+    void shouldCreateTask() {
         Task task = createTestTask();
         taskManager.createTask(task);
         final List<Task> tasks = taskManager.getListOfTasks();
@@ -73,7 +73,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void shouldCreateEpic() throws IOException, InterruptedException {
+    void shouldCreateEpic(){
         Epic epic = createTestEpic();
         taskManager.createEpic(epic);
         final List<Task> epics = taskManager.getListOfEpicTasks();
@@ -90,7 +90,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void shouldCreateSubtask() throws IOException, InterruptedException {
+    void shouldCreateSubtask() {
         Epic epic = createTestEpic();
         taskManager.createEpic(epic);
         Subtask subTask = createTestSubtask();

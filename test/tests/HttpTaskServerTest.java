@@ -4,6 +4,7 @@ import api.HttpTaskManager;
 import api.HttpTaskServer;
 
 import api.KVServer;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import managers.Managers;
@@ -21,11 +22,12 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
-import java.time.Month;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class HttpTaskServerTest {
+    Gson gson = Managers.getGson();
     KVServer kvServer;
     HttpTaskServer httpTaskServer;
     TaskManager taskManager;
@@ -39,7 +41,7 @@ class HttpTaskServerTest {
         task.setStartTime(LocalDateTime.now());
         task.setDuration(10);
         URI url = URI.create("http://localhost:8080/tasks/task/");
-        String json = Managers.getGson().toJson(task);
+        String json = gson.toJson(task);
         final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
         request = HttpRequest.newBuilder()
                 .uri(url)
@@ -48,15 +50,14 @@ class HttpTaskServerTest {
         client = HttpClient.newHttpClient();
         client.send(request, HttpResponse.BodyHandlers.ofString());
         return task;
-
     }
 
-    private void createHttpEpic() throws IOException, InterruptedException {
+    private Epic createHttpEpic() throws IOException, InterruptedException {
         Epic epic = new Epic();
         epic.setName("Эпик");
         epic.setDescription("Описание эпика");
         URI url = URI.create("http://localhost:8080/tasks/epic/");
-        String json = Managers.getGson().toJson(epic);
+        String json = gson.toJson(epic);
         final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
         request = HttpRequest.newBuilder()
                 .uri(url)
@@ -64,9 +65,10 @@ class HttpTaskServerTest {
                 .build();
         client = HttpClient.newHttpClient();
         client.send(request, HttpResponse.BodyHandlers.ofString());
+        return epic;
     }
 
-    protected void createHttpSubtask(int epicId) throws IOException, InterruptedException {
+    private Subtask createHttpSubtask(int epicId) throws IOException, InterruptedException {
         Subtask subtask = new Subtask();
         subtask.setName("Подзадача эпика");
         subtask.setDescription("описание подзадачи");
@@ -74,7 +76,7 @@ class HttpTaskServerTest {
         subtask.setDuration(20);
         subtask.setEpicId(epicId);
         URI url = URI.create("http://localhost:8080/tasks/subtask/");
-        String json = Managers.getGson().toJson(subtask);
+        String json = gson.toJson(subtask);
         final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
         request = HttpRequest.newBuilder()
                 .uri(url)
@@ -82,6 +84,7 @@ class HttpTaskServerTest {
                 .build();
         client = HttpClient.newHttpClient();
         client.send(request, HttpResponse.BodyHandlers.ofString());
+        return subtask;
     }
 
     @BeforeEach
@@ -96,7 +99,7 @@ class HttpTaskServerTest {
     }
 
     @AfterEach
-    void stopServer(){
+    void stopServer() {
         kvServer.stop();
         httpTaskServer.stop();
     }
@@ -105,9 +108,10 @@ class HttpTaskServerTest {
     void shouldCreateTask() throws IOException, InterruptedException {
         createHttpTask();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(200, response.statusCode(),"Неправильный код ответа" + response.statusCode());
+        assertEquals(200, response.statusCode(), "Неправильный код ответа" + response.statusCode());
         System.out.println(response.body());
     }
+
     @Test
     void shouldCreateSubtask() throws IOException, InterruptedException {
         createHttpEpic();
@@ -120,7 +124,7 @@ class HttpTaskServerTest {
     void shouldCreateEpic() throws IOException, InterruptedException {
         createHttpEpic();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(200, response.statusCode(),"Неправильный код ответа" + response.statusCode());
+        assertEquals(200, response.statusCode(), "Неправильный код ответа" + response.statusCode());
     }
 
     @Test
@@ -191,6 +195,7 @@ class HttpTaskServerTest {
         assertEquals(200, response.statusCode());
         System.out.println(response.body());
     }
+
     @Test
     void shouldDeleteAllEpics() throws IOException, InterruptedException {
         createHttpEpic();
@@ -205,15 +210,18 @@ class HttpTaskServerTest {
         assertEquals(200, response.statusCode());
         System.out.println(response.body());
     }
+
     @Test
     void shouldGetTaskById() throws IOException, InterruptedException {
         createHttpTask();
+        createHttpTask();
         HttpClient client = HttpClient.newHttpClient();
-        URI url = URI.create("http://localhost:8080/tasks/task/?id=1");
+        URI url = URI.create("http://localhost:8080/tasks/task/?id=2");
         HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, response.statusCode());
     }
+
     @Test
     void shouldGetSubtaskById() throws IOException, InterruptedException {
         createHttpEpic();
@@ -228,8 +236,9 @@ class HttpTaskServerTest {
     @Test
     void shouldGetEpicById() throws IOException, InterruptedException {
         createHttpEpic();
+        createHttpEpic();
         HttpClient client = HttpClient.newHttpClient();
-        URI url = URI.create("http://localhost:8080/tasks/epic/?id=1");
+        URI url = URI.create("http://localhost:8080/tasks/epic/?id=2");
         HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, response.statusCode());
@@ -238,7 +247,6 @@ class HttpTaskServerTest {
     @Test
     void shouldDeleteTaskById() throws IOException, InterruptedException {
         createHttpTask();
-        createHttpTask(); // не понимаю почему, если я создаю только одну задачу, то он не удаляет, но через инсомнию все хорошо
         HttpClient client = HttpClient.newHttpClient();
         URI url = URI.create("http://localhost:8080/tasks/task/?id=1");
         HttpRequest request = HttpRequest.newBuilder()
@@ -248,13 +256,14 @@ class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, response.statusCode());
     }
+
     @Test
     void shouldDeleteSubtaskById() throws IOException, InterruptedException {
         createHttpEpic();
         createHttpSubtask(1);
-        createHttpSubtask(1); // здесь то же
+        createHttpSubtask(1);
         HttpClient client = HttpClient.newHttpClient();
-        URI url = URI.create("http://localhost:8080/tasks/subtask/?id=1");
+        URI url = URI.create("http://localhost:8080/tasks/subtask/?id=2");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
                 .DELETE()
@@ -266,9 +275,9 @@ class HttpTaskServerTest {
     @Test
     void shouldDeleteEpicById() throws IOException, InterruptedException {
         createHttpEpic();
-        createHttpEpic(); // и здесь
+        createHttpEpic();
         HttpClient client = HttpClient.newHttpClient();
-        URI url = URI.create("http://localhost:8080/tasks/epic/?id=1");
+        URI url = URI.create("http://localhost:8080/tasks/epic/?id=2");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
                 .DELETE()
@@ -279,13 +288,17 @@ class HttpTaskServerTest {
 
     @Test
     void shouldGetPrioritizedTasks() throws IOException, InterruptedException {
-        Task task = createHttpTask();
+        createHttpTask();
         Task task1 = createHttpTask();
         task1.setStartTime(LocalDateTime.now().plusDays(1));
         taskManager.updateTask(task1);
         Task task2 = createHttpTask();
         task2.setStartTime(LocalDateTime.now().plusDays(2));
         taskManager.updateTask(task2);
+        createHttpEpic();
+        Subtask subtask = createHttpSubtask(3);             
+        subtask.setStartTime(LocalDateTime.now().minusHours(5));
+        taskManager.updateTask(subtask);
 
         HttpClient client = HttpClient.newHttpClient();
         URI url = URI.create("http://localhost:8080/tasks/");

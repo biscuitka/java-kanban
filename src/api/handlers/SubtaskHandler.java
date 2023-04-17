@@ -59,9 +59,9 @@ public class SubtaskHandler implements HttpHandler {
                 if (type.equals(TypeOfTask.SUBTASK)) {
                     subTask = gson.fromJson(element, Subtask.class);
                 }
-                if (id == null) {
+                assert subTask != null;
+                if (subTask.getId() == 0) {
                     taskManager.createSubtask(subTask);
-                    assert subTask != null;
                     response = "Подзадача добавлена под id: " + subTask.getId();
                 } else {
                     taskManager.updateSubTask(subTask);

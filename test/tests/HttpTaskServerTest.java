@@ -296,7 +296,7 @@ class HttpTaskServerTest {
         task2.setStartTime(LocalDateTime.now().plusDays(2));
         taskManager.updateTask(task2);
         createHttpEpic();
-        Subtask subtask = createHttpSubtask(3);             
+        Subtask subtask = createHttpSubtask(3);
         subtask.setStartTime(LocalDateTime.now().minusHours(5));
         taskManager.updateTask(subtask);
 

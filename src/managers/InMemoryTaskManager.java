@@ -328,7 +328,7 @@ public class InMemoryTaskManager implements TaskManager {
         return new ArrayList<>(prioritizedTasks);
     }
 
-    private void addToPrioritizedTasks(Task task){
+    protected void addToPrioritizedTasks(Task task){
         if (isTimeIntersection(task)) {
             throw new TimeIntersectionException("Пересечение по времени с другими задачами");
         }

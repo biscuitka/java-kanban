@@ -42,7 +42,8 @@ public class HttpTaskManager extends FileBackedTasksManager {
             tasks.add(gson.fromJson(element, Task.class));
         }
         for (Task task : tasks){
-            createTask(task);
+            taskStorage.put(task.getId(), task);
+            addToPrioritizedTasks(task);
         }
 
         JsonArray subElements = JsonParser.parseString(kvClient.load("subtasks")).getAsJsonArray();
@@ -50,7 +51,8 @@ public class HttpTaskManager extends FileBackedTasksManager {
             subtasks.add(gson.fromJson(element, Subtask.class));
         }
         for (Subtask subtask : subtasks){
-            createSubtask(subtask);
+            subTasksStorage.put(subtask.getId(), subtask);
+            addToPrioritizedTasks(subtask);
         }
 
         JsonArray epicElements = JsonParser.parseString(kvClient.load("epics")).getAsJsonArray();
@@ -58,7 +60,8 @@ public class HttpTaskManager extends FileBackedTasksManager {
             epics.add(gson.fromJson(element, Epic.class));
         }
         for (Epic epic : epics){
-            createEpic(epic);
+            epicTaskStorage.put(epic.getId(), epic);
+            addToPrioritizedTasks(epic);
         }
 
         String stringHistoryIds = JsonParser.parseString(kvClient.load("history")).getAsString();

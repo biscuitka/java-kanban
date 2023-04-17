@@ -61,9 +61,9 @@ public class TaskHandler implements HttpHandler {
                 if (type.equals(TypeOfTask.TASK)) {
                     task = gson.fromJson(element, Task.class);
                 }
-                if (id == null) {
+                assert task != null;
+                if (task.getId() == 0) {
                     taskManager.createTask(task);
-                    assert task != null;
                     response = "Простая задача добавлена под id: " + task.getId();
                 } else {
                     taskManager.updateTask(task);

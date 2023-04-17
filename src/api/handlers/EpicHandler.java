@@ -61,9 +61,9 @@ public class EpicHandler implements HttpHandler {
                 if (type.equals(TypeOfTask.EPIC)) {
                     epic = gson.fromJson(element, Epic.class);
                 }
-                if (id == null) {
+                assert epic != null;
+                if (epic.getId() == 0) {
                     taskManager.createEpic(epic);
-                    assert epic != null;
                     response = "Эпик добавлен под id: " + epic.getId();
                 } else {
                     taskManager.updateEpic(epic);

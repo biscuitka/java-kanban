@@ -57,7 +57,6 @@ public class EpicHandler implements HttpHandler {
                 String body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
                 JsonElement element = JsonParser.parseString(body);
                 TypeOfTask type = gson.fromJson(element.getAsJsonObject().get("type"), TypeOfTask.class);
-                Integer id = gson.fromJson(element.getAsJsonObject().get("id"), Integer.class);
                 if (type.equals(TypeOfTask.EPIC)) {
                     epic = gson.fromJson(element, Epic.class);
                 }

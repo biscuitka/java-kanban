@@ -56,7 +56,6 @@ public class TaskHandler implements HttpHandler {
                 InputStream inputStream = exchange.getRequestBody();
                 String body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
                 JsonElement element = JsonParser.parseString(body);
-                Integer id = gson.fromJson(element.getAsJsonObject().get("id"), Integer.class);
                 TypeOfTask type = gson.fromJson(element.getAsJsonObject().get("type"), TypeOfTask.class);
                 if (type.equals(TypeOfTask.TASK)) {
                     task = gson.fromJson(element, Task.class);
